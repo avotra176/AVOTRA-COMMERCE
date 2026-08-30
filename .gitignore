@@ -1,0 +1,62 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment variables / secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+pnpm-debug.log*
+
+# Build files
+dist/
+build/
+coverage/
+
+# APK / buids
+*.apk
+*.aab
+
+# Expo
+.expo/
+.expo-shared/
+
+# Buids outputs
+dist/
+build/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+
+# React Native
+.metro-health-check*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+
+# Temporary files
+*.tmp
+*.temp
+
+# Local database / secrets
+*.sqlite
+*.sqlite3
+
+# Certificates / private keys
+*.pem
+*.key
+*.p12
+*.keystore
