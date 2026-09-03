@@ -3,6 +3,7 @@ import { pool } from "../config/database";
 import { Vente, CreateVente } from "../types/vente.types";
 
 export const VenteModel = {
+  // creation de vente
   async create(vente: CreateVente): Promise<Vente> {
     const result = await pool.query(
       `INSERT INTO ventes (produit_id, utilisateur_id, quantite, prix_unitaire, montant_total, date_vente)
@@ -17,17 +18,17 @@ export const VenteModel = {
     );
     return result.rows[0];
   },
-
+  // retourne toutes les ventes
   async findAll(): Promise<Vente[]> {
     const result = await pool.query("SELECT * FROM ventes ORDER BY id DESC");
     return result.rows;
   },
-
+  // retourne une vente par Id
   async findById(id: number): Promise<Vente | null> {
     const result = await pool.query("SELECT * FROM ventes WHERE id = $1", [id]);
     return result.rows[0] ?? null;
   },
-
+  //mise a jour de vente
   async update(id: number, vente: CreateVente): Promise<Vente | null> {
     const result = await pool.query(
       `UPDATE ventes SET produit_id=$1, utilisateur_id=$2, quantite=$3, prix_unitaire=$4, montant_total=$5
@@ -43,7 +44,7 @@ export const VenteModel = {
     );
     return result.rows[0];
   },
-
+  // suppression de vente
   async delete(id: number): Promise<Vente | null> {
     const result = await pool.query("DELETE FROM ventes WHERE id=$1 RETURNING *", [id]);
     return result.rows[0] ?? null;

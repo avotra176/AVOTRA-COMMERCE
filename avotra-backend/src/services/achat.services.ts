@@ -100,10 +100,7 @@ export const AchatService = {
     },
 
     // MODIFIER UN ACHAT
-    async updateAchat(
-        id: number,
-        data: CreateAchat
-    ) {
+    async updateAchat(id: number, data: CreateAchat) {
         if (!Number.isInteger(id) || id <= 0) {
             throw new Error("ID d'achat invalide");
         }
@@ -117,76 +114,50 @@ export const AchatService = {
         }
 
         if (data.quantite <= 0) {
-            throw new Error(
-                "La quantité doit être supérieure à 0"
-            );
+            throw new Error("La quantité doit être supérieure à 0");
         }
 
         if (data.prix_unitaire <= 0) {
-            throw new Error(
-                "Le prix unitaire doit être supérieur à 0"
-            );
+            throw new Error("Le prix unitaire doit être supérieur à 0");
         }
 
-        const ancienAchat =
-            await AchatModel.getByIdAchat(id);
+        const ancienAchat = await AchatModel.getByIdAchat(id);
 
         if (!ancienAchat) {
             throw new Error("Achat introuvable");
         }
 
-        const ancienProduit =
-            await ProduitModel.getByIdProduit(
-                ancienAchat.produit_id
-            );
+        const ancienProduit = await ProduitModel.getByIdProduit(ancienAchat.produit_id);
 
         if (!ancienProduit) {
-            throw new Error(
-                "Ancien produit introuvable"
-            );
+            throw new Error("Ancien produit introuvable");
         }
 
-        const nouveauProduit =
-            await ProduitModel.getByIdProduit(
-                data.produit_id
-            );
+        const nouveauProduit = await ProduitModel.getByIdProduit(data.produit_id);
 
         if (!nouveauProduit) {
             throw new Error("Produit introuvable");
         }
 
-        const montant_total =
-            data.quantite * data.prix_unitaire;
+        const montant_total = data.quantite * data.prix_unitaire;
 
         // CAS 1 : même produit
-        if (
-            ancienAchat.produit_id === data.produit_id
-        ) {
-            const difference =
-                Number(data.quantite) -
-                Number(ancienAchat.quantite);
-
-            const nouveauStock =
-                Number(ancienProduit.stock) + difference;
+        if (ancienAchat.produit_id === data.produit_id) {
+            const difference = Number(data.quantite) - Number(ancienAchat.quantite);
+            const nouveauStock = Number(ancienProduit.stock) + difference;
 
             if (nouveauStock < 0) {
-                throw new Error(
-                    "Stock insuffisant pour cette modification"
-                );
+                throw new Error("Stock insuffisant pour cette modification");
             }
 
-            await ProduitModel.updateStock(
-                data.produit_id,
-                nouveauStock
-            );
+            await ProduitModel.updateStock(data.produit_id, nouveauStock);
 
             if (difference > 0) {
                 await Mouvement_stockModel.createMouvement_stock({
                     produit_id: data.produit_id,
                     type_mouvement: "ENTRE",
                     quantite: difference,
-                    observation:
-                        "Augmentation d'un achat",
+                    observation: "Augmentation d'un achat",
                 });
             }
 
@@ -195,62 +166,41 @@ export const AchatService = {
                     produit_id: data.produit_id,
                     type_mouvement: "SORTIE",
                     quantite: Math.abs(difference),
-                    observation:
-                        "Diminution d'un achat",
+                    observation: "Diminution d'un achat",
                 });
             }
         }
 
         // CAS 2 : produit changé
         else {
-            // Retirer l'ancien achat de l'ancien produit
-            const ancienStock =
-                Number(ancienProduit.stock) -
-                Number(ancienAchat.quantite);
+            const ancienStock = Number(ancienProduit.stock) - Number(ancienAchat.quantite);
 
             if (ancienStock < 0) {
-                throw new Error(
-                    "Impossible de modifier : stock ancien insuffisant"
-                );
+                throw new Error("Impossible de modifier : stock ancien insuffisant");
             }
 
-            await ProduitModel.updateStock(
-                ancienAchat.produit_id,
-                ancienStock
-            );
+            await ProduitModel.updateStock(ancienAchat.produit_id, ancienStock);
 
             await Mouvement_stockModel.createMouvement_stock({
                 produit_id: ancienAchat.produit_id,
                 type_mouvement: "SORTIE",
                 quantite: ancienAchat.quantite,
-                observation:
-                    "Annulation de l'ancien achat",
+                observation: "Annulation de l'ancien achat",
             });
 
-            // Ajouter le nouvel achat au nouveau produit
-            const nouveauStock =
-                Number(nouveauProduit.stock) +
-                Number(data.quantite);
+            const nouveauStock = Number(nouveauProduit.stock) + Number(data.quantite);
 
-            await ProduitModel.updateStock(
-                data.produit_id,
-                nouveauStock
-            );
+            await ProduitModel.updateStock(data.produit_id, nouveauStock);
 
             await Mouvement_stockModel.createMouvement_stock({
                 produit_id: data.produit_id,
                 type_mouvement: "ENTRE",
                 quantite: data.quantite,
-                observation:
-                    "Nouveau produit lors de modification d'achat",
+                observation: "Nouveau produit lors de modification d'achat",
             });
         }
 
-        return await AchatModel.updateAchat(
-            id,
-            data,
-            montant_total
-        );
+        return await AchatModel.updateAchat(id, data, montant_total);
     },
 
     // SUPPRIMER UN ACHAT
@@ -286,10 +236,7 @@ export const AchatService = {
         }
 
         // Retirer la quantité du stock
-        await ProduitModel.updateStock(
-            achat.produit_id,
-            nouveauStock
-        );
+        await ProduitModel.updateStock(achat.produit_id, nouveauStock);
 
         // Mouvement de stock
         await Mouvement_stockModel.createMouvement_stock({

@@ -8,29 +8,27 @@ export const Mouvement_stockModel = {
             produit_id,
             type_mouvement,
             quantite,
-            observation,
+            date_mouvement,
+            observation
         )
-        VALUES ($1, $2, $3, $4) RETURNING *
+        VALUES ($1, $2, $3, NOW(), $4) RETURNING *
         `;
 
         const values = [
             data.produit_id,
             data.type_mouvement,
             data.quantite,
-            data.observation
+            data.observation,
         ];
         const result = await pool.query(query, values);
         return result.rows[0];
     },
 
-    // Affichage toutes le mouvement de stock
     async getAllMouvementStock(): Promise<Mouvement_stock[]> {
-        const result = await pool.query("SELECT * FROM mouvements_stock ORDER BY ID DESC");
-
+        const result = await pool.query("SELECT * FROM mouvements_stock ORDER BY id DESC");
         return result.rows;
     },
 
-    // Affichage mouvement de stock par id 
     async getByIdMouvementStock(id: number): Promise<Mouvement_stock | null> {
         const result = await pool.query("SELECT * FROM mouvements_stock WHERE id=$1", [id]);
         return result.rows[0] ?? null;

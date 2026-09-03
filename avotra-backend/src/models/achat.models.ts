@@ -3,10 +3,7 @@ import { Achat, CreateAchat } from "../types/achat.types";
 
 export const AchatModel = {
     // Ajouter un achat
-    async createAchat(
-        data: CreateAchat,
-        montant_total: number
-    ): Promise<Achat> {
+    async createAchat(data: CreateAchat, montant_total: number): Promise<Achat> {
         const query = `
       INSERT INTO achats (
         produit_id,
@@ -88,11 +85,7 @@ export const AchatModel = {
     },
 
     // Modifier un achat
-    async updateAchat(
-        id: number,
-        data: CreateAchat,
-        montant_total: number
-    ): Promise<Achat | null> {
+    async updateAchat(id: number, data: CreateAchat, montant_total: number): Promise<Achat | null> {
         const query = `
       UPDATE achats
       SET
@@ -123,4 +116,6 @@ export const AchatModel = {
     async deleteAchat(id: number): Promise<void> {
         await pool.query("DELETE FROM achats WHERE id = $1 RETURNING *", [id]);
     },
+
+
 };

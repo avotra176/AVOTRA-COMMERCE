@@ -121,9 +121,7 @@ export const getAchatById = async (
   }
 };
 
-// =====================================================
 // MODIFIER
-// =====================================================
 export const updateAchat = async (
   req: Request,
   res: Response
@@ -155,9 +153,7 @@ export const updateAchat = async (
   }
 };
 
-// =====================================================
 // SUPPRIMER
-// =====================================================
 export const deleteAchat = async (
   req: Request,
   res: Response
