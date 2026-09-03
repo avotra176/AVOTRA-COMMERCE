@@ -18,12 +18,12 @@ export const VenteModel = {
     return result.rows[0];
   },
 
-  async findAll() : Promise<Vente[]> {
+  async findAll(): Promise<Vente[]> {
     const result = await pool.query("SELECT * FROM ventes ORDER BY id DESC");
     return result.rows;
   },
 
-  async findById(id: number) : Promise<Vente | null> {
+  async findById(id: number): Promise<Vente | null> {
     const result = await pool.query("SELECT * FROM ventes WHERE id = $1", [id]);
     return result.rows[0] ?? null;
   },
@@ -49,7 +49,7 @@ export const VenteModel = {
     return result.rows[0] ?? null;
   },
 
-  async checkStock(produitId: number) : Promise<{ id: number; stock: number } | null> {
+  async checkStock(produitId: number): Promise<{ id: number; stock: number } | null> {
     const result = await pool.query("SELECT id, stock FROM produits WHERE id = $1", [produitId]);
     return result.rows[0] ?? null;
   },
@@ -72,7 +72,7 @@ export const VenteModel = {
 
   async createMouvement(produitId: number, type: string, quantite: number): Promise<void> {
     await pool.query(
-      `INSERT INTO mouvements (produit_id, type_mouvement, quantite, date_mouvement)
+      `INSERT INTO mouvements_stock (produit_id, type_mouvement, quantite, date_mouvement)
        VALUES ($1, $2, $3, NOW())`,
       [produitId, type, quantite]
     );

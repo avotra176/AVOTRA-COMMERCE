@@ -7,7 +7,6 @@ const router = Router();
 // Ajouter
 router.post("/", authMiddleware, createAchat);
 // Rechercher
-// IMPORTANT : cette route doit être AVANT /:id
 router.get("/recherche", authMiddleware, searchAchat);
 // Afficher tous
 router.get("/", authMiddleware, getAchat);

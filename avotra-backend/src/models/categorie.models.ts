@@ -93,9 +93,7 @@ export const CategorieModel = {
         return result.rows[0] ?? null;
     },
 
-    // =====================================================
     // DELETE
-    // =====================================================
     async delete(id: number): Promise<Categorie | null> {
 
         const result = await pool.query<Categorie>(

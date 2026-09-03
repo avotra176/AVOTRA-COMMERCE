@@ -51,7 +51,7 @@ export const VenteService = {
       await VenteModel.createMouvement(data.produit_id, "SORTIE", quantiteDiff);
     } else if (quantiteDiff < 0) {
       await VenteModel.incrementStock(data.produit_id, Math.abs(quantiteDiff));
-      await VenteModel.createMouvement(data.produit_id, "ENTREE", Math.abs(quantiteDiff));
+      await VenteModel.createMouvement(data.produit_id, "ENTRE", Math.abs(quantiteDiff));
     }
 
     const venteData: CreateVente = {
@@ -70,7 +70,7 @@ export const VenteService = {
     }
 
     await VenteModel.incrementStock(venteExistant.produit_id, venteExistant.quantite);
-    await VenteModel.createMouvement(venteExistant.produit_id, "ENTREE", venteExistant.quantite);
+    await VenteModel.createMouvement(venteExistant.produit_id, "ENTRE", venteExistant.quantite);
 
     return await VenteModel.delete(id);
   },

@@ -40,7 +40,7 @@ export const searchAchats = async (value: string): Promise<Achat[]> => {
     const headers = await getHeaders();
     const search = value.trim();
 
-    const response = await api.get<ApiResponse<Achat[]>>('/achats/search', { headers, params: { search } });
+    const response = await api.get<ApiResponse<Achat[]>>('/achats/recherche', { headers, params: { search } });
     console.log("Réponse API recherche achats:", response.data);
     return response.data.data;
 };
@@ -63,6 +63,6 @@ export const updateAchat = async (id: number, data: CreateAchat,): Promise<Achat
 // supprimer un achats 
 export const deleteAchat = async (id: number): Promise<void> => {
     const headers = await getHeaders();
-    await api.delete(`/achats/${id}`);
+    await api.delete(`/achats/${id}`, { headers });
 };
 

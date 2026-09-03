@@ -4,9 +4,7 @@ import { ProduitModel } from "../models/produit.models";
 import { Mouvement_stockModel } from "../models/mouvement_stock.models";
 
 export const AchatService = {
-    // =====================================================
     // AJOUTER UN ACHAT
-    // =====================================================
     async createAchat(data: CreateAchat) {
         if (!data.produit_id) {
             throw new Error("Le produit est obligatoire");
@@ -69,16 +67,12 @@ export const AchatService = {
         return achat;
     },
 
-    // =====================================================
     // AFFICHER TOUS LES ACHATS
-    // =====================================================
     async getAchat() {
         return await AchatModel.getAllAchat();
     },
 
-    // =====================================================
     // AFFICHER UN ACHAT
-    // =====================================================
     async getAchatById(id: number) {
         if (!Number.isInteger(id) || id <= 0) {
             throw new Error("ID d'achat invalide");
@@ -94,11 +88,9 @@ export const AchatService = {
         return achat;
     },
 
-    // =====================================================
     // RECHERCHER
-    // =====================================================
-    async searchAchat(search: string) {
-        const value = search.trim();
+    async searchAchat(recherche: string) {
+        const value = recherche.trim();
 
         if (!value) {
             return await AchatModel.getAllAchat();
@@ -107,9 +99,7 @@ export const AchatService = {
         return await AchatModel.searchAchat(value);
     },
 
-    // =====================================================
     // MODIFIER UN ACHAT
-    // =====================================================
     async updateAchat(
         id: number,
         data: CreateAchat
@@ -168,9 +158,7 @@ export const AchatService = {
         const montant_total =
             data.quantite * data.prix_unitaire;
 
-        // =================================================
         // CAS 1 : même produit
-        // =================================================
         if (
             ancienAchat.produit_id === data.produit_id
         ) {
@@ -213,9 +201,7 @@ export const AchatService = {
             }
         }
 
-        // =================================================
         // CAS 2 : produit changé
-        // =================================================
         else {
             // Retirer l'ancien achat de l'ancien produit
             const ancienStock =
@@ -267,9 +253,7 @@ export const AchatService = {
         );
     },
 
-    // =====================================================
     // SUPPRIMER UN ACHAT
-    // =====================================================
     async deleteAchat(id: number) {
         if (!Number.isInteger(id) || id <= 0) {
             throw new Error("ID d'achat invalide");

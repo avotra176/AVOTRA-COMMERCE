@@ -121,9 +121,6 @@ export const AchatModel = {
 
     // Supprimer un achat
     async deleteAchat(id: number): Promise<void> {
-        await pool.query(
-            "DELETE FROM achats WHERE id = $1",
-            [id]
-        );
+        await pool.query("DELETE FROM achats WHERE id = $1 RETURNING *", [id]);
     },
 };

@@ -2,25 +2,35 @@ import { StyleSheet } from 'react-native';
 
 // COLORS
 export const colors = {
-    primary: "#1F5BFF",
-    primarySoft: "#EAF2FF",
-    primaryDark: "#123AA8",
-    accent: "#D9B76A",
-    accentSoft: "#F7EFCB",
-    highlight: "#9CC5FF",
-    background: "#F4F8FF",
+    // Couleur principale : vert profond "registre comptable"
+    primary: "#1C4B3A",
+    primarySoft: "#E4EEE8",
+    primaryDark: "#123328",
+
+    // Accent laiton — réservé aux moments forts (ex: CA du dashboard)
+    accent: "#BD8A3F",
+    accentSoft: "#F3E7D2",
+    highlight: "#CDE3D6",
+
+    background: "#F2F4F0",
     surface: "#FFFFFF",
-    surfaceAlt: "#EDF4FF",
-    text: "#0F172A",
-    textSecondary: "#5B6B82",
-    textLight: "#8BA0B9",
-    border: "#DDE8F7",
-    success: "#16A34A",
-    danger: "#DC2626",
-    warning: "#F59E0B",
-    black: "#0F172A",
+    surfaceAlt: "#EAF0EA",
+    surfaceSunken: "#E9EDE7",
+
+    text: "#141B16",
+    textSecondary: "#5B665C",
+    textLight: "#8B978D",
+
+    border: "#DDE3DA",
+
+    success: "#2F7D52",
+    danger: "#B3261E",
+    dangerSoft: "#F7DEDB",
+    warning: "#C08A3E",
+
+    black: "#141B16",
     white: "#FFFFFF",
-    muted: "#F8FAFC",
+    muted: "#F3F5F1",
 };
 
 export const spacing = {
@@ -35,8 +45,8 @@ export const spacing = {
 export const raduis = {
     sm: 10,
     md: 14,
-    lg: 18,
-    xl: 24,
+    lg: 20,
+    xl: 26,
     round: 999,
 };
 
@@ -66,13 +76,14 @@ export const styles = StyleSheet.create({
         fontSize: 28,
         fontWeight: "800",
         color: colors.text,
-        letterSpacing: -0.7,
+        letterSpacing: -0.8,
         fontFamily: "System",
     },
     subtitle: {
         marginTop: spacing.xs,
         fontSize: 14,
         color: colors.textSecondary,
+        lineHeight: 19,
     },
 
     // bouton ajouter
@@ -86,8 +97,8 @@ export const styles = StyleSheet.create({
         paddingHorizontal: spacing.lg,
         borderRadius: 14,
         shadowColor: colors.primaryDark,
-        shadowOpacity: 0.18,
-        shadowRadius: 10,
+        shadowOpacity: 0.22,
+        shadowRadius: 12,
         shadowOffset: { width: 0, height: 8 },
         elevation: 3,
     },
@@ -114,8 +125,8 @@ export const styles = StyleSheet.create({
         justifyContent: "center",
         paddingHorizontal: spacing.lg,
         shadowColor: colors.primaryDark,
-        shadowOpacity: 0.12,
-        shadowRadius: 12,
+        shadowOpacity: 0.16,
+        shadowRadius: 14,
         shadowOffset: { width: 0, height: 8 },
         elevation: 3,
     },
@@ -136,16 +147,16 @@ export const styles = StyleSheet.create({
     // cartes
     card: {
         backgroundColor: colors.surface,
-        borderRadius: 20,
+        borderRadius: 18,
         padding: spacing.lg,
         marginBottom: spacing.md,
         borderWidth: 1,
         borderColor: colors.border,
-        shadowColor: "#0F172A",
-        shadowOpacity: 0.06,
-        shadowRadius: 12,
-        shadowOffset: { width: 0, height: 6 },
-        elevation: 3,
+        shadowColor: colors.black,
+        shadowOpacity: 0.05,
+        shadowRadius: 14,
+        shadowOffset: { width: 0, height: 5 },
+        elevation: 2,
     },
 
     // inputs
@@ -158,7 +169,7 @@ export const styles = StyleSheet.create({
         fontSize: 16,
         color: colors.text,
         backgroundColor: colors.surface,
-        shadowColor: "#0F172A",
+        shadowColor: colors.black,
         shadowOpacity: 0.02,
         shadowRadius: 4,
         shadowOffset: { width: 0, height: 2 },
@@ -176,12 +187,12 @@ export const styles = StyleSheet.create({
         backgroundColor: colors.surface,
         borderWidth: 1,
         borderColor: colors.border,
-        borderRadius: 20,
+        borderRadius: 18,
         padding: spacing.lg,
         marginBottom: spacing.md,
-        shadowColor: "#0F172A",
+        shadowColor: colors.black,
         shadowOpacity: 0.04,
-        shadowRadius: 8,
+        shadowRadius: 10,
         shadowOffset: { width: 0, height: 4 },
         elevation: 2,
     },
@@ -212,6 +223,7 @@ export const styles = StyleSheet.create({
     emptyText: {
         fontSize: 16,
         color: colors.textSecondary,
+        textAlign: "center",
     },
 
     containerSearch: {
@@ -225,7 +237,7 @@ export const styles = StyleSheet.create({
         borderWidth: 1,
         borderColor: colors.border,
         borderRadius: 12,
-        shadowColor: "#0F172A",
+        shadowColor: colors.black,
         shadowOpacity: 0.03,
         shadowRadius: 6,
         shadowOffset: { width: 0, height: 2 },
@@ -281,15 +293,15 @@ export const styles = StyleSheet.create({
         height: 52,
         marginTop: 24,
         marginBottom: 20,
-        borderRadius: 12,
+        borderRadius: 14,
         backgroundColor: colors.primary,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
         gap: 7,
         shadowColor: colors.primaryDark,
-        shadowOpacity: 0.18,
-        shadowRadius: 12,
+        shadowOpacity: 0.2,
+        shadowRadius: 14,
         shadowOffset: { width: 0, height: 8 },
         elevation: 4,
     },
@@ -316,7 +328,7 @@ export const styles = StyleSheet.create({
         height: 50,
         borderWidth: 1,
         borderColor: colors.border,
-        shadowColor: "#0F172A",
+        shadowColor: colors.black,
         shadowOpacity: 0.02,
         shadowRadius: 6,
         shadowOffset: { width: 0, height: 2 },
@@ -351,6 +363,7 @@ export const styles = StyleSheet.create({
         fontSize: 17,
         fontWeight: "800",
         color: colors.text,
+        letterSpacing: -0.3,
     },
     infoRow: {
         flexDirection: "row",
@@ -377,7 +390,7 @@ export const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         padding: 11,
-        borderRadius: 10,
+        borderRadius: 12,
         backgroundColor: colors.muted,
         gap: 6,
     },
@@ -387,8 +400,8 @@ export const styles = StyleSheet.create({
         justifyContent: "center",
         alignItems: "center",
         padding: 11,
-        borderRadius: 10,
-        backgroundColor: "#FEE2E2",
+        borderRadius: 12,
+        backgroundColor: colors.dangerSoft,
         gap: 6,
     },
     text: {
@@ -417,10 +430,15 @@ export const styles = StyleSheet.create({
         alignItems: "center",
         gap: 8,
         marginTop: 20,
-        backgroundColor: colors.black,
+        backgroundColor: colors.primary,
         paddingHorizontal: 18,
         paddingVertical: 12,
-        borderRadius: 10,
+        borderRadius: 12,
+        shadowColor: colors.primaryDark,
+        shadowOpacity: 0.18,
+        shadowRadius: 10,
+        shadowOffset: { width: 0, height: 6 },
+        elevation: 3,
     },
     emptyButtonText: {
         color: colors.white,
@@ -428,20 +446,20 @@ export const styles = StyleSheet.create({
     },
     modalBackground: {
         flex: 1,
-        backgroundColor: "rgba(15, 23, 42, 0.52)",
+        backgroundColor: "rgba(20, 27, 22, 0.55)",
         justifyContent: "flex-end",
     },
     modal: {
         maxHeight: "92%",
         backgroundColor: colors.surface,
-        borderTopLeftRadius: 24,
-        borderTopRightRadius: 24,
+        borderTopLeftRadius: 28,
+        borderTopRightRadius: 28,
         paddingHorizontal: 20,
         paddingTop: 18,
         paddingBottom: 20,
-        shadowColor: "#0F172A",
-        shadowOpacity: 0.12,
-        shadowRadius: 18,
+        shadowColor: colors.black,
+        shadowOpacity: 0.14,
+        shadowRadius: 20,
         shadowOffset: { width: 0, height: -8 },
         elevation: 8,
     },
@@ -455,6 +473,7 @@ export const styles = StyleSheet.create({
         fontSize: 21,
         fontWeight: "700",
         color: colors.text,
+        letterSpacing: -0.4,
     },
 
     horizontalList: {
@@ -470,8 +489,8 @@ export const styles = StyleSheet.create({
         backgroundColor: colors.surface,
     },
     choiceSelected: {
-        backgroundColor: colors.black,
-        borderColor: colors.black,
+        backgroundColor: colors.primary,
+        borderColor: colors.primary,
     },
     choiceText: {
         fontSize: 14,
@@ -485,7 +504,7 @@ export const styles = StyleSheet.create({
     totalBox: {
         marginTop: 20,
         padding: 15,
-        borderRadius: 14,
+        borderRadius: 16,
         backgroundColor: colors.surfaceAlt,
         flexDirection: "row",
         justifyContent: "space-between",
@@ -501,18 +520,24 @@ export const styles = StyleSheet.create({
     totalValue: {
         fontSize: 18,
         fontWeight: "700",
-        color: colors.text,
+        color: colors.primary,
+        letterSpacing: -0.3,
     },
     submitButton: {
         height: 52,
-        backgroundColor: colors.black,
-        borderRadius: 12,
+        backgroundColor: colors.primary,
+        borderRadius: 14,
         marginTop: 20,
         marginBottom: 20,
         flexDirection: "row",
         alignItems: "center",
         justifyContent: "center",
         gap: 8,
+        shadowColor: colors.primaryDark,
+        shadowOpacity: 0.2,
+        shadowRadius: 14,
+        shadowOffset: { width: 0, height: 8 },
+        elevation: 4,
     },
     disabledButton: {
         opacity: 0.6,
@@ -559,7 +584,7 @@ export const styles = StyleSheet.create({
     overlay: {
         flex: 1,
         justifyContent: "flex-end",
-        backgroundColor: "rgba(15, 23, 42, 0.52)",
+        backgroundColor: "rgba(20, 27, 22, 0.55)",
     },
     details: {
         flexDirection: "row",
@@ -579,276 +604,3 @@ export const styles = StyleSheet.create({
         color: colors.danger,
     },
 });
-//     paddingBottom: spacing.xxl,
-//   },
-
-//   emptyContainer: {
-//     flexGrow: 1,
-//     justifyContent: "center",
-//   },
-
-//   // Carte achat
-//   card: {
-//     backgroundColor: colors.white,
-//     borderRadius: radius.xl,
-//     padding: spacing.lg,
-//     marginBottom: 14,
-//   },
-
-//   cardHeader: {
-//     flexDirection: "row",
-//     justifyContent: "space-between",
-//     alignItems: "flex-start",
-//   },
-
-//   achatTitle: {
-//     fontSize: 18,
-//     fontWeight: "700",
-//     color: colors.text,
-//   },
-
-//   achatId: {
-//     color: colors.textSecondary,
-//     marginTop: 3,
-//   },
-
-//   total: {
-//     fontSize: 17,
-//     fontWeight: "700",
-//     color: colors.text,
-//   },
-
-//   separator: {
-//     height: 1,
-//     backgroundColor: colors.separator,
-//     marginVertical: spacing.md,
-//   },
-
-//   infoRow: {
-//     flexDirection: "row",
-//     justifyContent: "space-between",
-//   },
-
-//   infoItem: {
-//     flexDirection: "row",
-//     alignItems: "center",
-//     flex: 1,
-//   },
-
-//   infoText: {
-//     marginLeft: 7,
-//     fontSize: 14,
-//     color: colors.text,
-//   },
-
-//   price: {
-//     marginTop: spacing.md,
-//     color: colors.textLight,
-//   },
-
-//   // Actions
-//   actions: {
-//     flexDirection: "row",
-//     marginTop: 15,
-//     gap: 10,
-//   },
-
-//   editButton: {
-//     flex: 1,
-//     flexDirection: "row",
-//     justifyContent: "center",
-//     alignItems: "center",
-//     padding: 11,
-//     borderRadius: radius.md,
-//     backgroundColor: colors.editBackground,
-//     gap: 6,
-//   },
-
-//   deleteButton: {
-//     flex: 1,
-//     flexDirection: "row",
-//     justifyContent: "center",
-//     alignItems: "center",
-//     padding: 11,
-//     borderRadius: radius.md,
-//     backgroundColor: colors.deleteBackground,
-//     gap: 6,
-//   },
-
-//   buttonText: {
-//     fontWeight: "600",
-//     color: colors.text,
-//   },
-
-//   deleteText: {
-//     fontWeight: "600",
-//     color: colors.danger,
-//   },
-
-//   // Chargement
-//   loading: {
-//     flex: 1,
-//     alignItems: "center",
-//     justifyContent: "center",
-//   },
-
-//   loadingText: {
-//     marginTop: 10,
-//     color: colors.text,
-//   },
-
-//   // Écran vide
-//   empty: {
-//     alignItems: "center",
-//     paddingHorizontal: spacing.xxl,
-//   },
-
-//   emptyTitle: {
-//     fontSize: 20,
-//     fontWeight: "700",
-//     marginTop: 15,
-//     color: colors.text,
-//   },
-
-//   emptyText: {
-//     textAlign: "center",
-//     color: colors.textSecondary,
-//     marginTop: spacing.sm,
-//   },
-
-//   emptyButton: {
-//     flexDirection: "row",
-//     alignItems: "center",
-//     gap: spacing.sm,
-//     marginTop: spacing.xl,
-//     backgroundColor: colors.black,
-//     paddingHorizontal: 18,
-//     paddingVertical: 12,
-//     borderRadius: radius.md,
-//   },
-
-//   emptyButtonText: {
-//     color: colors.white,
-//     fontWeight: "600",
-//   },
-
-//   // Modal
-//   modalBackground: {
-//     flex: 1,
-//     backgroundColor: "rgba(0, 0, 0, 0.45)",
-//     justifyContent: "flex-end",
-//   },
-
-//   modal: {
-//     backgroundColor: colors.white,
-//     borderTopLeftRadius: 25,
-//     borderTopRightRadius: 25,
-//     maxHeight: "92%",
-//     padding: spacing.xl,
-//   },
-
-//   modalHeader: {
-//     flexDirection: "row",
-//     justifyContent: "space-between",
-//     alignItems: "center",
-//     marginBottom: spacing.xl,
-//   },
-
-//   modalTitle: {
-//     fontSize: 22,
-//     fontWeight: "700",
-//     color: colors.text,
-//   },
-
-//   // Formulaire
-//   label: {
-//     fontSize: 15,
-//     fontWeight: "600",
-//     marginBottom: spacing.sm,
-//     marginTop: spacing.md,
-//     color: colors.text,
-//   },
-
-//   horizontalList: {
-//     marginBottom: 5,
-//   },
-
-//   choice: {
-//     borderWidth: 1,
-//     borderColor: colors.border,
-//     paddingHorizontal: 14,
-//     paddingVertical: 10,
-//     borderRadius: radius.md,
-//     marginRight: spacing.sm,
-//   },
-
-//   choiceSelected: {
-//     backgroundColor: colors.black,
-//     borderColor: colors.black,
-//   },
-
-//   choiceText: {
-//     fontSize: 14,
-//     color: colors.text,
-//   },
-
-//   choiceTextSelected: {
-//     color: colors.white,
-//     fontWeight: "600",
-//   },
-
-//   input: {
-//     height: 50,
-//     borderWidth: 1,
-//     borderColor: colors.border,
-//     borderRadius: radius.md,
-//     paddingHorizontal: 14,
-//     fontSize: 16,
-//     backgroundColor: colors.inputBackground,
-//     color: colors.text,
-//   },
-
-//   totalBox: {
-//     marginTop: spacing.xl,
-//     padding: 15,
-//     borderRadius: radius.lg,
-//     backgroundColor: colors.lightBackground,
-//     flexDirection: "row",
-//     justifyContent: "space-between",
-//     alignItems: "center",
-//   },
-
-//   totalLabel: {
-//     fontSize: 16,
-//     fontWeight: "600",
-//     color: colors.text,
-//   },
-
-//   totalValue: {
-//     fontSize: 18,
-//     fontWeight: "700",
-//     color: colors.text,
-//   },
-
-//   submitButton: {
-//     height: 52,
-//     backgroundColor: colors.black,
-//     borderRadius: radius.lg,
-//     marginTop: spacing.xl,
-//     marginBottom: spacing.xl,
-//     flexDirection: "row",
-//     alignItems: "center",
-//     justifyContent: "center",
-//     gap: spacing.sm,
-//   },
-
-//   disabledButton: {
-//     opacity: 0.6,
-//   },
-
-//   submitText: {
-//     color: colors.white,
-//     fontSize: 16,
-//     fontWeight: "700",
-//   },
-// });

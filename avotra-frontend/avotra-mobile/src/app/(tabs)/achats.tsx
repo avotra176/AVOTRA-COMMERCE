@@ -35,7 +35,7 @@ export default function AchatsScreen() {
     const [form, setForm] = useState<FormState>(initialForm);
     const [saving, setSaving] = useState(false);
     const { produits } = useProduits();
-    const { fournisseurs } = useFournisseurs();
+    const { fournisseurs, addFournisseur } = useFournisseurs();
     const { user } = useAuth();
 
     // CHARGER LES ACHATS
@@ -273,6 +273,8 @@ export default function AchatsScreen() {
         return (fournisseur?.nom || `Fournisseur #${id}`);
     };
 
+
+
     // LOADING
     if (loading) {
         return (
@@ -372,6 +374,7 @@ export default function AchatsScreen() {
                 onClose={() => setModalVisible(false)}
                 onSubmit={handleSubmit}
                 setForm={setForm}
+                onCreateFournisseur={addFournisseur}
             />
 
         </SafeAreaView>

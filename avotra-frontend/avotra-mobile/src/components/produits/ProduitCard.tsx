@@ -32,7 +32,7 @@ export default function ProduitCard({ produit, onEdit, onDelete }: Props) {
                     <Text style={styles.unit}>Unité : {produit.unite}</Text>
                 </View>
 
-                // action ajouter et modification
+                {/* action ajouter et modification*/}
                 <View style={styles.actions}>
                     <Pressable
                         onPress={() => onEdit(produit)}

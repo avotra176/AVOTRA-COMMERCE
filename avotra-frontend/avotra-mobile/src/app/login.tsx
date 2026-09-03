@@ -83,9 +83,6 @@ export default function LoginScreen() {
       <View style={[styles.card, { padding: 28, borderRadius: 24 }]}>
 
 
-        {/* <Text style={[styles.title, { fontSize: 34, textAlign: "center", color: "#1F5BFF", letterSpacing: 0.5 }]}>
-          AVOTRA
-        </Text> */}
 
         <Text style={[styles.title, { fontSize: 22, textAlign: "center", marginTop: 8 }]}>
           AVOTRA COMMERCE

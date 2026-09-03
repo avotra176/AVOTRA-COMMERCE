@@ -31,7 +31,11 @@ export const useProduits = () => {
     // actualiser les produits
     const refresh = async () => {
         setRefreshing(true);
-        await loadProduits();
+        try {
+            loadProduits();
+        } finally {
+            setRefreshing(false);
+        }
     };
 
     // Rechrecher les produits par nom

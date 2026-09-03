@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
     ActivityIndicator,
     KeyboardAvoidingView,
@@ -12,19 +12,22 @@ import {
 } from "react-native";
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Achat, FormState } from "../../types/achat.types";
+import { Fournisseur, CreateFournisseur } from "../../types/fournisseur.types";
 import { styles } from "../../styles/styles.global";
+import FournisseurPicker from "@/components/ui/fournisseurPicker";
 
 interface Props {
     visible: boolean;
     editingAchat: Achat | null;
     form: FormState;
     produits: any[];
-    fournisseurs: any[];
+    fournisseurs: Fournisseur[];
     montantTotal: number;
     saving: boolean;
     onClose: () => void;
     onSubmit: () => void;
     setForm: React.Dispatch<React.SetStateAction<FormState>>;
+    onCreateFournisseur: (data: CreateFournisseur) => Promise<Fournisseur>;
 }
 
 export default function AchatFormModal({
@@ -38,7 +41,14 @@ export default function AchatFormModal({
     onClose,
     onSubmit,
     setForm,
+    onCreateFournisseur,
 }: Props) {
+    const [fournisseurPickerVisible, setFournisseurPickerVisible] = useState(false);
+
+    const selectedFournisseur = fournisseurs.find(
+        (f) => f.id === form.fournisseur_id
+    );
+
     return (
         <Modal
             visible={visible}
@@ -104,37 +114,16 @@ export default function AchatFormModal({
                             Fournisseur
                         </Text>
 
-                        <ScrollView
-                            horizontal
-                            showsHorizontalScrollIndicator={false}
+                        <Pressable
+                            style={styles.input}
+                            onPress={() => setFournisseurPickerVisible(true)}
                         >
-                            {fournisseurs.map((fournisseur) => (
-                                <Pressable
-                                    key={fournisseur.id}
-                                    style={[
-                                        styles.choice,
-                                        form.fournisseur_id === fournisseur.id &&
-                                        styles.choiceSelected,
-                                    ]}
-                                    onPress={() =>
-                                        setForm((prev) => ({
-                                            ...prev,
-                                            fournisseur_id: fournisseur.id,
-                                        }))
-                                    }
-                                >
-                                    <Text
-                                        style={[
-                                            styles.choiceText,
-                                            form.fournisseur_id === fournisseur.id &&
-                                            styles.choiceTextSelected,
-                                        ]}
-                                    >
-                                        {fournisseur.nom}
-                                    </Text>
-                                </Pressable>
-                            ))}
-                        </ScrollView>
+                            <Text style={{ color: selectedFournisseur ? "#000" : "#999" }}>
+                                {selectedFournisseur
+                                    ? selectedFournisseur.nom
+                                    : "Sélectionner un fournisseur"}
+                            </Text>
+                        </Pressable>
 
                         <Text style={styles.label}>
                             Quantité
@@ -209,6 +198,17 @@ export default function AchatFormModal({
                     </ScrollView>
                 </View>
             </KeyboardAvoidingView>
+
+            <FournisseurPicker
+                visible={fournisseurPickerVisible}
+                fournisseurs={fournisseurs}
+                selectedId={form.fournisseur_id}
+                onClose={() => setFournisseurPickerVisible(false)}
+                onSelect={(f) =>
+                    setForm((prev) => ({ ...prev, fournisseur_id: f.id }))
+                }
+                onCreate={onCreateFournisseur}
+            />
         </Modal>
     );
 }
