@@ -1,10 +1,14 @@
+import { PoolClient } from "pg";
 import { pool } from "../config/database";
 import { Achat, CreateAchat } from "../types/achat.types";
 
 export const AchatModel = {
-    // Ajouter un achat
-    async createAchat(data: CreateAchat, montant_total: number): Promise<Achat> {
-        const query = `
+  async createAchat(
+    data: CreateAchat,
+    montant_total: number,
+    client?: PoolClient
+  ): Promise<Achat> {
+    const query = `
       INSERT INTO achats (
         produit_id,
         utilisateur_id,
@@ -17,54 +21,49 @@ export const AchatModel = {
       RETURNING *;
     `;
 
-        const values = [
-            data.produit_id,
-            data.utilisateur_id,
-            data.fournisseur_id,
-            data.quantite,
-            data.prix_unitaire,
-            montant_total,
-        ];
+    const values = [
+      data.produit_id,
+      data.utilisateur_id,
+      data.fournisseur_id,
+      data.quantite,
+      data.prix_unitaire,
+      montant_total,
+    ];
 
-        const result = await pool.query<Achat>(query, values);
-        const achat = result.rows[0];
+    const executor = client ?? pool;
+    const result = await executor.query<Achat>(query, values);
+    const achat = result.rows[0];
 
-        if (!achat) {
-            throw new Error("Achat non créé");
-        }
+    if (!achat) {
+      throw new Error("Achat non créé");
+    }
 
-        return achat;
-    },
+    return achat;
+  },
 
-    // Afficher tous les achats
-    async getAllAchat(): Promise<Achat[]> {
-        const query = `
-      SELECT *
-      FROM achats
-      ORDER BY id DESC;
-    `;
+  async getAllAchat(): Promise<Achat[]> {
+    const query = `SELECT * FROM achats ORDER BY id DESC;`;
+    const result = await pool.query<Achat>(query);
+    return result.rows;
+  },
 
-        const result = await pool.query<Achat>(query);
+  async getByIdAchat(id: number, client?: PoolClient): Promise<Achat | null> {
+    const query = `SELECT * FROM achats WHERE id = $1;`;
+    const executor = client ?? pool;
+    const result = await executor.query<Achat>(query, [id]);
+    return result.rows[0] ?? null;
+  },
 
-        return result.rows;
-    },
+  // Version avec verrou, pour éviter qu'un autre achat sur le même produit
+  // ne s'exécute en même temps pendant une modification/suppression
+  async getByIdAchatForUpdate(id: number, client: PoolClient): Promise<Achat | null> {
+    const query = `SELECT * FROM achats WHERE id = $1 FOR UPDATE;`;
+    const result = await client.query<Achat>(query, [id]);
+    return result.rows[0] ?? null;
+  },
 
-    // Afficher un achat par ID
-    async getByIdAchat(id: number): Promise<Achat | null> {
-        const query = `
-      SELECT *
-      FROM achats
-      WHERE id = $1;
-    `;
-
-        const result = await pool.query<Achat>(query, [id]);
-
-        return result.rows[0] ?? null;
-    },
-
-    // Rechercher des achats
-    async searchAchat(search: string): Promise<Achat[]> {
-        const query = `
+  async searchAchat(search: string): Promise<Achat[]> {
+    const query = `
       SELECT a.*
       FROM achats a
       LEFT JOIN produits p
@@ -76,17 +75,18 @@ export const AchatModel = {
         OR p.nom ILIKE $1
       ORDER BY a.id DESC;
     `;
+    const values = [`%${search}%`];
+    const result = await pool.query<Achat>(query, values);
+    return result.rows;
+  },
 
-        const values = [`%${search}%`];
-
-        const result = await pool.query<Achat>(query, values);
-
-        return result.rows;
-    },
-
-    // Modifier un achat
-    async updateAchat(id: number, data: CreateAchat, montant_total: number): Promise<Achat | null> {
-        const query = `
+  async updateAchat(
+    id: number,
+    data: CreateAchat,
+    montant_total: number,
+    client?: PoolClient
+  ): Promise<Achat | null> {
+    const query = `
       UPDATE achats
       SET
         produit_id = $1,
@@ -98,24 +98,22 @@ export const AchatModel = {
       RETURNING *;
     `;
 
-        const values = [
-            data.produit_id,
-            data.fournisseur_id,
-            data.quantite,
-            data.prix_unitaire,
-            montant_total,
-            id,
-        ];
+    const values = [
+      data.produit_id,
+      data.fournisseur_id,
+      data.quantite,
+      data.prix_unitaire,
+      montant_total,
+      id,
+    ];
 
-        const result = await pool.query<Achat>(query, values);
+    const executor = client ?? pool;
+    const result = await executor.query<Achat>(query, values);
+    return result.rows[0] ?? null;
+  },
 
-        return result.rows[0] ?? null;
-    },
-
-    // Supprimer un achat
-    async deleteAchat(id: number): Promise<void> {
-        await pool.query("DELETE FROM achats WHERE id = $1 RETURNING *", [id]);
-    },
-
-
+  async deleteAchat(id: number, client?: PoolClient): Promise<void> {
+    const executor = client ?? pool;
+    await executor.query("DELETE FROM achats WHERE id = $1", [id]);
+  },
 };

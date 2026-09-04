@@ -1,8 +1,12 @@
+import { PoolClient } from "pg";
 import { pool } from '../config/database';
 import { Mouvement_stock, CreateMouvementStock } from '../types/mouvement_stock.types';
 
 export const Mouvement_stockModel = {
-    async createMouvement_stock(data: CreateMouvementStock): Promise<Mouvement_stock> {
+    async createMouvement_stock(
+        data: CreateMouvementStock,
+        client?: PoolClient
+    ): Promise<Mouvement_stock> {
         const query = `
         INSERT INTO mouvements_stock (
             produit_id,
@@ -20,7 +24,9 @@ export const Mouvement_stockModel = {
             data.quantite,
             data.observation,
         ];
-        const result = await pool.query(query, values);
+
+        const executor = client ?? pool;
+        const result = await executor.query(query, values);
         return result.rows[0];
     },
 

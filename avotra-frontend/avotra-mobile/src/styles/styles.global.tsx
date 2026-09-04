@@ -2,35 +2,36 @@ import { StyleSheet } from 'react-native';
 
 // COLORS
 export const colors = {
-    // Couleur principale : vert profond "registre comptable"
-    primary: "#1C4B3A",
-    primarySoft: "#E4EEE8",
-    primaryDark: "#123328",
+    // Vert du logo — couleur principale
+    primary: "#1E7145",
+    primarySoft: "#E3F1E7",
+    primaryDark: "#124A2C",
 
-    // Accent laiton — réservé aux moments forts (ex: CA du dashboard)
-    accent: "#BD8A3F",
-    accentSoft: "#F3E7D2",
-    highlight: "#CDE3D6",
+    // Bleu du logo (le "A") — accent réservé
+    accent: "#155DBD",
+    accentSoft: "#E1EBFB",
+    highlight: "#CFE0F7",
 
-    background: "#F2F4F0",
+    background: "#F3F6F4",
     surface: "#FFFFFF",
-    surfaceAlt: "#EAF0EA",
-    surfaceSunken: "#E9EDE7",
+    surfaceAlt: "#EAF1EC",
+    surfaceSunken: "#E7EDE9",
 
-    text: "#141B16",
-    textSecondary: "#5B665C",
-    textLight: "#8B978D",
+    // Anthracite du wordmark, plus doux qu'un noir pur
+    text: "#26282B",
+    textSecondary: "#666F6A",
+    textLight: "#93998F",
 
-    border: "#DDE3DA",
+    border: "#DFE6E1",
 
-    success: "#2F7D52",
+    success: "#2F9E5B",
     danger: "#B3261E",
     dangerSoft: "#F7DEDB",
-    warning: "#C08A3E",
+    warning: "#D9A441",
 
-    black: "#141B16",
+    black: "#26282B",
     white: "#FFFFFF",
-    muted: "#F3F5F1",
+    muted: "#F2F5F2",
 };
 
 export const spacing = {
