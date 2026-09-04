@@ -13,7 +13,7 @@ import {
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Vente, FormState } from "@/types/vente.types";
 import { Produit } from "@/types/produit.types";
-import { styles } from "@/styles/styles.global";
+import { useTheme } from "../../constants/theme.constants";
 import ProduitPicker from "@/components/ui/ProduitPicker";
 
 interface Props {
@@ -41,9 +41,8 @@ export default function VenteFormModal({
 }: Props) {
     const [produitPickerVisible, setProduitPickerVisible] = useState(false);
 
-    const selectedProduit = produits.find(
-        (p) => p.id === form.produit_id
-    );
+    const selectedProduit = produits.find((p) => p.id === form.produit_id);
+    const { styles, colors } = useTheme();
 
     return (
         <Modal

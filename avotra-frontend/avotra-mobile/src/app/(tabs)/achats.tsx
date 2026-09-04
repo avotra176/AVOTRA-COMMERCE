@@ -16,10 +16,11 @@ import { Achat, CreateAchat, FormState, initialForm } from "../../types/achat.ty
 import { useProduits } from "../../hooks/useProduits";
 import { useFournisseurs } from "../../hooks/useFournisseurs";
 import { useAuth } from "../../constants/auth.constants";
-import { styles } from '../../styles/styles.global';
+import { useTheme } from "../../constants/theme.constants";
 import EmptyAchats from "@/components/achats/EmptyAchats";
 import AchatCard from "@/components/achats/AchatCard";
 import AchatFormModal from "@/components/achats/AchatFormModal";
+import { colors } from '../../styles/styles.global';
 
 
 
@@ -272,7 +273,7 @@ export default function AchatsScreen() {
         const fournisseur = fournisseurs?.find((item: any) => item.id === id);
         return (fournisseur?.nom || `Fournisseur #${id}`);
     };
-
+    const { styles, colors } = useTheme();
 
 
     // LOADING
@@ -312,7 +313,7 @@ export default function AchatsScreen() {
                 <Ionicons
                     name="search-outline"
                     size={22}
-                    color="#777"
+                    color={colors.textSecondary}
                 />
                 <TextInput
                     style={styles.searchInput}
@@ -329,7 +330,7 @@ export default function AchatsScreen() {
                         <Ionicons
                             name="close-circle"
                             size={22}
-                            color="#777"
+                            color={colors.textSecondary}
                         />
                     </Pressable>
                 )}

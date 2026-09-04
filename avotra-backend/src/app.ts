@@ -1,9 +1,9 @@
-import  express  from "express";
+import express from "express";
 import produitsRoutes from "./routes/produit.routes";
 import venteRoute from "./routes/ventes.routes";
 import categorieRoutes from "./routes/categorie.routes";
 import authRoutes from "./routes/auth.routes";
-import depenseRoute from "./routes/depense.routes";
+import depenseRoutes from "./routes/depense.routes";
 import fournisseurRoutes from "./routes/fournisseur.routes";
 import achatsRoute from "./routes/achat.routes";
 import { pool } from "./config/database";
@@ -12,7 +12,7 @@ const app = express();
 
 app.use(express.json());
 
-app.get("/", (req,res)=> {
+app.get("/", (req, res) => {
     res.send("Bienvenue sud l ' API AVOTRA COMMERCE ");
 });
 
@@ -32,7 +32,7 @@ app.use("/ventes", venteRoute);
 app.use("/categories", categorieRoutes);
 
 // Routes depenese
-app.use("/depenses", depenseRoute);
+app.use("/depenses-perso", depenseRoutes);
 
 // Routes fournisseurs
 app.use("/fournisseurs", fournisseurRoutes);

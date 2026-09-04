@@ -4,28 +4,31 @@ import {
     TouchableOpacity,
     ScrollView,
     View,
+    Switch,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useAuth } from "../../constants/auth.constants";
-import { styles, colors } from "../../styles/styles.global";
+import { useTheme } from "../../constants/theme.constants";
 
 interface MenuItemProps {
     icon: keyof typeof Ionicons.glyphMap;
     label: string;
-    onPress: () => void;
+    onPress?: () => void;
     danger?: boolean;
+    rightElement?: React.ReactNode;
 }
 
-function MenuItem({ icon, label, onPress, danger }: MenuItemProps) {
-    return (
+export default function ProfilScreen() {
+    const router = useRouter();
+    const { user, logout } = useAuth();
+    const { styles, colors, isDark, toggleTheme } = useTheme();
+
+    const MenuItem = ({ icon, label, onPress, danger, rightElement }: MenuItemProps) => (
         <TouchableOpacity
-            style={{
-                flexDirection: "row",
-                alignItems: "center",
-                paddingVertical: 14,
-            }}
+            style={{ flexDirection: "row", alignItems: "center", paddingVertical: 14 }}
             onPress={onPress}
+            disabled={!onPress}
         >
             <View
                 style={{
@@ -38,34 +41,16 @@ function MenuItem({ icon, label, onPress, danger }: MenuItemProps) {
                     marginRight: 14,
                 }}
             >
-                <Ionicons
-                    name={icon}
-                    size={19}
-                    color={danger ? colors.danger : colors.primary}
-                />
+                <Ionicons name={icon} size={19} color={danger ? colors.danger : colors.primary} />
             </View>
 
-            <Text
-                style={{
-                    flex: 1,
-                    fontSize: 15,
-                    fontWeight: "500",
-                    color: danger ? colors.danger : colors.text,
-                }}
-            >
+            <Text style={{ flex: 1, fontSize: 15, fontWeight: "500", color: danger ? colors.danger : colors.text }}>
                 {label}
             </Text>
 
-            {!danger && (
-                <Ionicons name="chevron-forward" size={18} color={colors.textLight} />
-            )}
+            {rightElement ?? (onPress && <Ionicons name="chevron-forward" size={18} color={colors.textLight} />)}
         </TouchableOpacity>
     );
-}
-
-export default function ProfilScreen() {
-    const router = useRouter();
-    const { user, logout } = useAuth();
 
     const handleLogout = () => {
         Alert.alert(
@@ -93,13 +78,10 @@ export default function ProfilScreen() {
             contentContainerStyle={[styles.content, { paddingTop: 55, flexGrow: 1 }]}
             showsVerticalScrollIndicator={false}
         >
-            <Text style={[styles.title, { marginBottom: 25 }]}>
-                Profil
-            </Text>
+            <Text style={[styles.title, { marginBottom: 25 }]}>Profil</Text>
 
-            {/* CARTE IDENTITÉ */}
             <View style={[styles.card, { alignItems: "center", paddingVertical: 30 }]}>
-                <TouchableOpacity
+                <View
                     style={{
                         width: 72,
                         height: 72,
@@ -109,37 +91,14 @@ export default function ProfilScreen() {
                         alignItems: "center",
                         marginBottom: 16,
                     }}
-                    onPress={() => Alert.alert("Photo de profil", "Bientôt disponible.")}
                 >
                     <Text style={{ fontSize: 28, fontWeight: "700", color: colors.primary }}>
                         {initiale}
                     </Text>
-                    <View
-                        style={{
-                            position: "absolute",
-                            bottom: -2,
-                            right: -2,
-                            width: 24,
-                            height: 24,
-                            borderRadius: 12,
-                            backgroundColor: colors.primary,
-                            justifyContent: "center",
-                            alignItems: "center",
-                            borderWidth: 2,
-                            borderColor: colors.surface,
-                        }}
-                    >
-                        <Ionicons name="camera" size={12} color={colors.white} />
-                    </View>
-                </TouchableOpacity>
+                </View>
 
-                <Text style={[styles.name, { fontSize: 19 }]}>
-                    {user?.nom || "Utilisateur"}
-                </Text>
-
-                <Text style={[styles.listText, { marginTop: 4 }]}>
-                    {user?.email}
-                </Text>
+                <Text style={[styles.name, { fontSize: 19 }]}>{user?.nom || "Utilisateur"}</Text>
+                <Text style={[styles.listText, { marginTop: 4 }]}>{user?.email}</Text>
 
                 {user?.role && (
                     <View
@@ -148,26 +107,23 @@ export default function ProfilScreen() {
                             paddingHorizontal: 14,
                             paddingVertical: 6,
                             borderRadius: 999,
-                            backgroundColor: colors.surfaceAlt,
+                            backgroundColor: colors.accentSoft,
                         }}
                     >
-                        <Text style={{ fontSize: 13, fontWeight: "600", color: colors.textSecondary }}>
+                        <Text style={{ fontSize: 13, fontWeight: "600", color: colors.accent }}>
                             {user.role}
                         </Text>
                     </View>
                 )}
             </View>
 
-            {/* MENU COMPTE */}
-            <Text style={[styles.label, { marginTop: 25, marginBottom: 5, marginLeft: 4 }]}>
-                Compte
-            </Text>
+            <Text style={[styles.label, { marginTop: 25, marginBottom: 5, marginLeft: 4 }]}>Compte</Text>
 
             <View style={[styles.card, { paddingVertical: 6 }]}>
                 <MenuItem
                     icon="key-outline"
                     label="Changer le mot de passe"
-                    onPress={() => router.push("/change-password")}
+                    onPress={() => router.push("/change-password" as any)}
                 />
                 <View style={styles.separator} />
                 <MenuItem
@@ -177,20 +133,23 @@ export default function ProfilScreen() {
                 />
             </View>
 
-            {/* MENU PRÉFÉRENCES */}
-            <Text style={[styles.label, { marginTop: 20, marginBottom: 5, marginLeft: 4 }]}>
-                Préférences
-            </Text>
+            <Text style={[styles.label, { marginTop: 20, marginBottom: 5, marginLeft: 4 }]}>Préférences</Text>
 
             <View style={[styles.card, { paddingVertical: 6 }]}>
                 <MenuItem
-                    icon="moon-outline"
+                    icon={isDark ? "moon" : "moon-outline"}
                     label="Mode sombre"
-                    onPress={() => Alert.alert("Mode sombre", "Bientôt disponible.")}
+                    rightElement={
+                        <Switch
+                            value={isDark}
+                            onValueChange={toggleTheme}
+                            trackColor={{ false: colors.border, true: colors.primary }}
+                            thumbColor={colors.white}
+                        />
+                    }
                 />
             </View>
 
-            {/* DÉCONNEXION */}
             <TouchableOpacity
                 style={[
                     styles.button,
@@ -200,9 +159,7 @@ export default function ProfilScreen() {
                 onPress={handleLogout}
             >
                 <Ionicons name="log-out-outline" size={20} color={colors.white} style={{ marginRight: 8 }} />
-                <Text style={styles.buttonText}>
-                    Se déconnecter
-                </Text>
+                <Text style={styles.buttonText}>Se déconnecter</Text>
             </TouchableOpacity>
         </ScrollView>
     );

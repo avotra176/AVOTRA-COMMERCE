@@ -15,7 +15,7 @@ import { useVentes } from "../../hooks/useVentes";
 import { useProduits } from "../../hooks/useProduits";
 import { useAuth } from "../../constants/auth.constants";
 import { Vente, CreateVente, FormState, initialForm } from "../../types/vente.types";
-import { styles } from "../../styles/styles.global";
+import { useTheme } from "../../constants/theme.constants";
 import EmptyVentes from "@/components/ventes/EmptyVentes";
 import VenteCard from "@/components/ventes/VenteCard";
 import VenteFormModal from "@/components/ventes/VenteFormModal";
@@ -31,6 +31,8 @@ export default function VentesScreen() {
     const [editingVente, setEditingVente] = useState<Vente | null>(null);
     const [form, setForm] = useState<FormState>(initialForm);
     const [saving, setSaving] = useState(false);
+
+    const { styles, colors } = useTheme();
 
     // REFRESH
     const handleRefresh = async () => {

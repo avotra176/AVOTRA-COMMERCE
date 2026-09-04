@@ -1,44 +1,61 @@
-import { DepenseModel } from '../models/depenses.models';
-import { Depense, CreateDepense } from '../types/depenses.types';
+import { DepenseModel } from "../models/depenses.models";
+import { CreateDepensePersonnelle, UpdateDepensePersonnelle } from "../types/depenses.types";
 
-export const DepenseServise = {
-    // Creation de depenses service 
-    async createDepense(data: Depense){
-        if(!data.libelle|| data.libelle.trim()===""){
-            throw new Error("La libelle de depenese est obligatoire");
+export const DepenseService = {
+    async createDepense(data: CreateDepensePersonnelle) {
+        if (!data.utilisateur_id) {
+            throw new Error("L'utilisateur est obligatoire");
         }
+        if (!data.titre || data.titre.trim() === "") {
+            throw new Error("Le titre est obligatoire");
+        }
+        if (!data.montant || data.montant <= 0) {
+            throw new Error("Le montant doit être supérieur à 0");
+        }
+
         return await DepenseModel.create(data);
     },
 
-    // Affichage toutes les depense services
-    async getALL(){
-        return await DepenseModel.findAll();
+    async getDepenses(utilisateur_id?: number) {
+        return await DepenseModel.findAll(utilisateur_id);
     },
 
-    // Affichage avec filtre par Id de depenses 
-    async getById(id: number){
+    async getDepenseById(id: number) {
         const depense = await DepenseModel.findById(id);
-        if (!depense){
-            throw new Error("Depenses introuvable");
+        if (!depense) {
+            throw new Error("Dépense introuvable");
         }
         return depense;
     },
 
-    // Mise a jours de depenses deja enregistrer evec un petite erreur 
-    async updateDepenseService(id:number, data:Depense){
-        const depense = await DepenseModel.findById(id);
-        if (!depense){
-            throw new Error("Depenses introuvable");
+    async updateDepense(id: number, utilisateur_id: number, data: UpdateDepensePersonnelle) {
+        if (!data.titre || data.titre.trim() === "") {
+            throw new Error("Le titre est obligatoire");
         }
+        if (!data.montant || data.montant <= 0) {
+            throw new Error("Le montant doit être supérieur à 0");
+        }
+
+        const existante = await DepenseModel.findById(id);
+        if (!existante) {
+            throw new Error("Dépense introuvable");
+        }
+        if (existante.utilisateur_id !== utilisateur_id) {
+            throw new Error("Vous ne pouvez pas modifier cette dépense");
+        }
+
         return await DepenseModel.update(id, data);
     },
 
-    // Effacer depenses 
-    async deleteDepense(id: number){
-        const depense = await DepenseModel.findById(id);
-        if(!depense){
-            throw new Error("Depenses introuvable");
+    async deleteDepense(id: number, utilisateur_id: number) {
+        const existante = await DepenseModel.findById(id);
+        if (!existante) {
+            throw new Error("Dépense introuvable");
         }
-        return DepenseModel.delete(id);
-    }
-}
+        if (existante.utilisateur_id !== utilisateur_id) {
+            throw new Error("Vous ne pouvez pas supprimer cette dépense");
+        }
+
+        await DepenseModel.delete(id);
+    },
+};

@@ -13,7 +13,7 @@ import {
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Achat, FormState } from "../../types/achat.types";
 import { Fournisseur, CreateFournisseur } from "../../types/fournisseur.types";
-import { styles } from "../../styles/styles.global";
+import { useTheme } from "../../constants/theme.constants";
 import FournisseurPicker from "@/components/ui/fournisseurPicker";
 
 interface Props {
@@ -43,6 +43,7 @@ export default function AchatFormModal({
     setForm,
     onCreateFournisseur,
 }: Props) {
+    const { styles, colors } = useTheme();
     const [fournisseurPickerVisible, setFournisseurPickerVisible] = useState(false);
 
     const selectedFournisseur = fournisseurs.find(

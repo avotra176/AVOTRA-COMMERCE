@@ -1,23 +1,22 @@
 import React from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { styles } from '../../styles/styles.global';
+import { useTheme } from "../../constants/theme.constants";
 
 export default function ProduitEmpty() {
+    const { styles, colors } = useTheme();
+
     return (
-        <View style={styles.container}>
+        <View style={styles.empty}>
             <Ionicons
                 name="cube-outline"
                 size={60}
-                color="#9CA3AF"
+                color={colors.textLight}
             />
-            <Text style={styles.title}>  Aucun produit </Text>
-            <Text style={styles.text}>
+            <Text style={styles.emptyTitle}>Aucun produit</Text>
+            <Text style={styles.emptyText}>
                 Aucun produit ne correspond à votre recherche.
             </Text>
-
         </View>
     );
 }
-
-

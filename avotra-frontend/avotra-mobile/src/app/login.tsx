@@ -6,7 +6,6 @@ import {
   Platform,
   Text,
   ScrollView,
-  RefreshControl,
   TextInput,
   TouchableOpacity,
   View,
@@ -14,7 +13,7 @@ import {
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import { useAuth } from "../constants/auth.constants";
-import { styles, colors } from "../styles/styles.global";
+import { useTheme } from "../constants/theme.constants";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -23,6 +22,7 @@ export default function LoginScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginLoading, setLoginLoading] = useState(false);
+  const { styles, colors } = useTheme();
 
   const handleLogin = async () => {
     if (!email.trim() || !password.trim()) {
@@ -106,7 +106,7 @@ export default function LoginScreen() {
             disabled={loginLoading}
           >
             {loginLoading ? (
-              <ActivityIndicator color="#fff" />
+              <ActivityIndicator color={colors.primary} />
             ) : (
               <Text style={styles.buttonText}>Se connecter</Text>
             )}

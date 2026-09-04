@@ -2,7 +2,7 @@ import React from "react";
 import { Pressable, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Vente } from "../../types/vente.types";
-import { styles } from "../../styles/styles.global";
+import { useTheme } from "../../constants/theme.constants";
 
 interface Props {
     item: Vente;
@@ -13,7 +13,7 @@ interface Props {
 
 export default function VenteCard({ item, getProduitNom, onEdit, onDelete }: Props) {
     const formatPrice = (value: number) => `${Number(value).toLocaleString("fr-FR")} Ar`;
-
+    const { styles, colors } = useTheme();
     return (
         <View style={styles.card}>
             <View style={styles.header}>

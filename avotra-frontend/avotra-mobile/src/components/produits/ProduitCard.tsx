@@ -1,8 +1,8 @@
 import React from "react";
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Produit } from "../../types/produit.types";
-import { styles } from '../../styles/styles.global';
+import { useTheme } from "../../constants/theme.constants";
 
 interface Props {
     produit: Produit;
@@ -11,12 +11,12 @@ interface Props {
 }
 
 export default function ProduitCard({ produit, onEdit, onDelete }: Props) {
+    const { styles, colors } = useTheme();
 
     const formatPrice = (value: number) => {
-        return `${Number(value).toLocaleString(
-            "fr-FR"
-        )} Ar`;
+        return `${Number(value).toLocaleString("fr-FR")} Ar`;
     };
+
     return (
         <View style={styles.card}>
             <View style={styles.header}>
@@ -24,7 +24,8 @@ export default function ProduitCard({ produit, onEdit, onDelete }: Props) {
                     <Ionicons
                         name="cube-outline"
                         size={26}
-                        color="#2563EB" />
+                        color={colors.primary}
+                    />
                 </View>
 
                 <View style={styles.info}>
@@ -41,7 +42,7 @@ export default function ProduitCard({ produit, onEdit, onDelete }: Props) {
                         <Ionicons
                             name="create-outline"
                             size={21}
-                            color="#2563EB"
+                            color={colors.primary}
                         />
                     </Pressable>
                     <Pressable
@@ -51,7 +52,7 @@ export default function ProduitCard({ produit, onEdit, onDelete }: Props) {
                         <Ionicons
                             name="trash-outline"
                             size={21}
-                            color="#DC2626"
+                            color={colors.danger}
                         />
                     </Pressable>
                 </View>
@@ -78,18 +79,13 @@ export default function ProduitCard({ produit, onEdit, onDelete }: Props) {
                     <Text
                         style={[
                             styles.value,
-                            produit.stock <= 0 &&
-                            styles.stockZero
+                            produit.stock <= 0 && styles.stockZero
                         ]}
                     >
                         {produit.stock}
                     </Text>
-
                 </View>
-
             </View>
-
         </View>
     );
 }
-

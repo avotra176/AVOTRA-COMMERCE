@@ -12,19 +12,15 @@ import ProduitForm from "../../components/produits/ProduitForm";
 import { useProduits } from "../../hooks/useProduits";
 import { Produit, ProduitFormData, initialForm } from "../../types/produit.types";
 import { useCategories } from "@/hooks/useCategories";
-import { styles } from "../../styles/styles.global";
-
-// CATÉGORIE
+import { useTheme } from "../../constants/theme.constants";
 
 interface Categorie {
     id: number;
     nom: string;
 }
 
-
-// ÉCRAN
-
 export default function ProduitsScreen() {
+    const { styles, colors } = useTheme();
     const {
         produits,
         loading,
@@ -37,18 +33,10 @@ export default function ProduitsScreen() {
         deleteProduit
     } = useProduits();
 
-    // CATÉGORIES
-
     const { categories, loading: loadingCategories, fetchCategories } = useCategories();
-    // MODAL
     const [modalVisible, setModalVisible] = useState(false);
-
-    // FORMULAIRE
     const [form, setForm] = useState<ProduitFormData>(initialForm);
-
-    // MODIFICATION // SAUVEGARDE  // OUVRIR AJOUT
     const [editingId, setEditingId] = useState<number | null>(null);
-
     const [saving, setSaving] = useState(false);
 
     const openCreate = async () => {
@@ -59,8 +47,6 @@ export default function ProduitsScreen() {
         setForm(initialForm);
         setModalVisible(true);
     };
-
-    // OUVRIR MODIFICATION
 
     const openEdit = (produit: Produit) => {
         setEditingId(produit.id);
@@ -75,8 +61,6 @@ export default function ProduitsScreen() {
         setModalVisible(true);
     };
 
-
-    // FERMER
     const closeModal = () => {
         if (saving) { return; }
         setModalVisible(false);
@@ -84,58 +68,31 @@ export default function ProduitsScreen() {
         setForm(initialForm);
     };
 
-    // VALIDATION
-
     const validate = (): boolean => {
         if (!form.categories_id) {
-            Alert.alert(
-                "Attention",
-                "Sélectionnez une catégorie."
-            );
+            Alert.alert("Attention", "Sélectionnez une catégorie.");
             return false;
         }
-
         if (!form.nom.trim()) {
-            Alert.alert(
-                "Attention",
-                "Le nom du produit est obligatoire."
-            );
+            Alert.alert("Attention", "Le nom du produit est obligatoire.");
             return false;
         }
         const prixAchat = Number(form.prix_achat);
         const prixVente = Number(form.prix_vente);
-
-        if (
-            !Number.isFinite(prixAchat) || prixAchat < 0
-        ) {
-            Alert.alert(
-                "Attention",
-                "Prix d'achat invalide."
-            );
+        if (!Number.isFinite(prixAchat) || prixAchat < 0) {
+            Alert.alert("Attention", "Prix d'achat invalide.");
             return false;
         }
-
-        if (
-            !Number.isFinite(prixVente) || prixVente < 0
-        ) {
-            Alert.alert(
-                "Attention",
-                "Prix de vente invalide."
-            );
+        if (!Number.isFinite(prixVente) || prixVente < 0) {
+            Alert.alert("Attention", "Prix de vente invalide.");
             return false;
         }
-
         if (!form.unite.trim()) {
-            Alert.alert(
-                "Attention",
-                "L'unité est obligatoire."
-            );
+            Alert.alert("Attention", "L'unité est obligatoire.");
             return false;
         }
         return true;
     };
-
-    // SAUVEGARDER  
 
     const handleSave = async () => {
         if (!validate()) { return; }
@@ -152,48 +109,28 @@ export default function ProduitsScreen() {
 
             if (editingId === null) {
                 await createProduit(data);
-                Alert.alert(
-                    "Succès",
-                    "Produit enregistré avec succès."
-                );
-
+                Alert.alert("Succès", "Produit enregistré avec succès.");
             } else {
-                await updateProduit(
-                    editingId,
-                    data
-                );
-                Alert.alert(
-                    "Succès",
-                    "Produit modifié avec succès."
-                );
+                await updateProduit(editingId, data);
+                Alert.alert("Succès", "Produit modifié avec succès.");
             }
             closeModal();
-
         } catch (error: any) {
             Alert.alert(
                 "Erreur",
-                error?.response?.data?.message ??
-                error?.message ??
-                "Une erreur est survenue."
+                error?.response?.data?.message ?? error?.message ?? "Une erreur est survenue."
             );
-
         } finally {
             setSaving(false);
         }
     };
 
-    // SUPPRIMER
-    const handleDelete = (
-        produit: Produit
-    ) => {
+    const handleDelete = (produit: Produit) => {
         Alert.alert(
             "Supprimer",
             `Voulez-vous supprimer "${produit.nom}" ?`,
             [
-                {
-                    text: "Annuler",
-                    style: "cancel"
-                },
+                { text: "Annuler", style: "cancel" },
                 {
                     text: "Supprimer",
                     style: "destructive",
@@ -201,17 +138,10 @@ export default function ProduitsScreen() {
                         try {
                             await deleteProduit(produit.id);
                             Alert.alert("Succès", "Produit supprimé.");
-
-                        } catch (
-                        error: any
-                        ) {
+                        } catch (error: any) {
                             Alert.alert(
                                 "Erreur",
-                                error?.response
-                                    ?.data
-                                    ?.message ??
-                                error?.message ??
-                                "Impossible de supprimer."
+                                error?.response?.data?.message ?? error?.message ?? "Impossible de supprimer."
                             );
                         }
                     }
@@ -220,15 +150,11 @@ export default function ProduitsScreen() {
         );
     };
 
-    // RENDU
-
     if (loading) {
         return (
-            <SafeAreaView style={styles.loading} >
-                <ActivityIndicator size="large" />
-                <Text style={styles.loadingText}>
-                    Chargement des produits...
-                </Text>
+            <SafeAreaView style={styles.loading}>
+                <ActivityIndicator size="large" color={colors.primary} />
+                <Text style={styles.loadingText}>Chargement des produits...</Text>
             </SafeAreaView>
         );
     }
@@ -246,14 +172,16 @@ export default function ProduitsScreen() {
                     disabled={loadingCategories}
                 >
                     {loadingCategories ? (
-                        <ActivityIndicator size="small" color="#FFFFFF" />
+                        <ActivityIndicator size="small" color={colors.white} />
                     ) : (
-                        <Ionicons name="add" size={20} color="#FFFFFF" />
+                        <Ionicons name="add" size={20} color={colors.white} />
                     )}
                     <Text style={styles.addText}>{loadingCategories ? "Chargement..." : "Ajouter"}</Text>
                 </Pressable>
             </View>
+
             <ProduitSearch value={search} onChangeText={searchProduits} onClear={() => searchProduits("")} />
+
             <FlatList
                 data={produits}
                 keyExtractor={(item) => String(item.id)}
@@ -264,6 +192,7 @@ export default function ProduitsScreen() {
                 refreshControl={<RefreshControl refreshing={refreshing} onRefresh={refresh} />}
                 ListEmptyComponent={<ProduitEmpty />}
             />
+
             <Modal visible={modalVisible} animationType="slide" transparent>
                 <KeyboardAvoidingView
                     behavior={Platform.OS === "ios" ? "padding" : undefined}
@@ -271,9 +200,11 @@ export default function ProduitsScreen() {
                 >
                     <View style={styles.modal}>
                         <View style={styles.modalHeader}>
-                            <Text style={styles.modalTitle}>{editingId === null ? "Créer produit" : "Modifier produit"}</Text>
+                            <Text style={styles.modalTitle}>
+                                {editingId === null ? "Créer produit" : "Modifier produit"}
+                            </Text>
                             <Pressable onPress={closeModal}>
-                                <Ionicons name="close" size={22} color="#111827" />
+                                <Ionicons name="close" size={22} color={colors.text} />
                             </Pressable>
                         </View>
 
@@ -289,8 +220,6 @@ export default function ProduitsScreen() {
                     </View>
                 </KeyboardAvoidingView>
             </Modal>
-
         </SafeAreaView>
     );
-
 }

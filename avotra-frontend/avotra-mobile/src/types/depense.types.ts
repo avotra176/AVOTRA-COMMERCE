@@ -1,13 +1,3 @@
-export interface CreateDepense {
-    libelle: string;
-    montant: number;
-    description: string;
-}
-
-export interface Depense extends CreateDepense {
-    id: number;
-    date_depenses: Date;
-}
 export interface DepensePersonnelle {
     id: number;
     utilisateur_id: number;
@@ -33,3 +23,26 @@ export interface UpdateDepensePersonnelle {
     categorie?: string;
     observation?: string;
 }
+
+export interface DepenseFormState {
+    titre: string;
+    montant: string;
+    categorie: string;
+    observation: string;
+}
+
+export const initialDepenseForm: DepenseFormState = {
+    titre: "",
+    montant: "",
+    categorie: "",
+    observation: "",
+};
+
+export const CATEGORIES_DEPENSE = [
+    "Nourriture",
+    "Transport",
+    "Logement",
+    "Santé",
+    "Loisirs",
+    "Autre",
+];

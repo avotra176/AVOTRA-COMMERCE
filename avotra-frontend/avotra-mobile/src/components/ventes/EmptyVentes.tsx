@@ -1,13 +1,14 @@
 import React from "react";
 import { Pressable, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { styles } from "../../styles/styles.global";
+import { useTheme } from "../../constants/theme.constants";
 
 interface Props {
     onAdd: () => void;
 }
 
 export default function EmptyVentes({ onAdd }: Props) {
+    const { styles, colors } = useTheme();
     return (
         <View style={styles.empty}>
             <Ionicons name="cash-outline" size={60} />

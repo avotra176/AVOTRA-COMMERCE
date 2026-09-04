@@ -1,98 +1,56 @@
-import { Request , Response} from 'express';
-import { DepenseServise } from '../services/depense.services';
+import { Request, Response } from "express";
+import { DepenseService } from "../services/depense.services";
 
-// Creation de fournissaur controllers 
-export const createDepense = async (req: Request, res: Response)=>{
-    try{
-        const fournisseur = await DepenseServise.createDepense(req.body);
+export const createDepense = async (req: Request, res: Response) => {
+    try {
+        const depense = await DepenseService.createDepense(req.body);
         res.status(201).json({
             success: true,
-            message: "Fournisseurs ajoutee avec succes.",
-            data: fournisseur,
+            message: "Dépense enregistrée avec succès.",
+            data: depense,
         });
-    }
-    catch (error: any){
-        return res.status(400).json({
-            success: false,
-            message: error.message,
-        })
+    } catch (error: any) {
+        res.status(400).json({ success: false, message: error.message });
     }
 };
 
-// Affichage toutes les fournisseurs controllers
-export const getDepense = async (res: Response)=>{
-    try{
-        const fournisseur = await DepenseServise.getALL();
-        res.status(200).json({
-            success: true,
-            data: fournisseur,
-        })
-    }
-    catch (error: any){
-        return res.status(500).json({
-            success: false,
-            message: error.message,
-        })
-    }
-}
+export const getDepenses = async (req: Request, res: Response) => {
+    try {
+        const utilisateur_id = req.query.utilisateur_id
+            ? Number(req.query.utilisateur_id)
+            : undefined;
 
-
-// Affichage fournisseur par id 
-export const getDepenseById = async (req: Request, res: Response)=>{
-    try{
-        const fournisseur = await DepenseServise.getById(Number(req.params.id));
-        if (!fournisseur){
-            return res.status(404).json({
-                success: false,
-                message: "Fournisseur introuvable.",
-            });
-
-        }
-        res.status(200).json({
-            success: true,
-            data: fournisseur,
-        })
-    }
-    catch (error: any){
-        return res.status(500).json({
-            success: false,
-            message: error.message,
-        });
+        const depenses = await DepenseService.getDepenses(utilisateur_id);
+        res.status(200).json({ success: true, data: depenses });
+    } catch (error: any) {
+        res.status(500).json({ success: false, message: error.message });
     }
 };
 
-// Mise a jour de fournisseur id 
-export const updateDepense = async (req:Request, res:Response)=>{
-    try{
-        const fournisseur = await DepenseServise.updateDepenseService(Number(req.params.id), req.body);
+export const updateDepense = async (req: Request, res: Response) => {
+    try {
+        const { utilisateur_id, ...data } = req.body;
+        const depense = await DepenseService.updateDepense(
+            Number(req.params.id),
+            utilisateur_id,
+            data
+        );
         res.status(200).json({
             success: true,
-            message: "Fournisseur modifie avec succes.",
-            data: fournisseur,
-        })
-    }
-    catch (error: any){
-        return res.status(400).json({
-            success: false,
-            message: error.message,
+            message: "Dépense modifiée avec succès.",
+            data: depense,
         });
+    } catch (error: any) {
+        res.status(400).json({ success: false, message: error.message });
     }
 };
 
-
-// Suppression de fournisseurs 
-export const deleteDepense = async (req:Request, res:Response)=>{
-    try{
-        await DepenseServise.deleteDepense(Number(req.params.id));
-        res.status(200).json({
-            success: true,
-            message: "Fournisseur supprimer avec succes",
-        });
-    }
-    catch (error: any){
-        return res.status(500).json({
-            seuccess: false,
-            message: error.message,
-        });
+export const deleteDepense = async (req: Request, res: Response) => {
+    try {
+        const utilisateur_id = Number(req.query.utilisateur_id);
+        await DepenseService.deleteDepense(Number(req.params.id), utilisateur_id);
+        res.status(200).json({ success: true, message: "Dépense supprimée avec succès." });
+    } catch (error: any) {
+        res.status(400).json({ success: false, message: error.message });
     }
 };

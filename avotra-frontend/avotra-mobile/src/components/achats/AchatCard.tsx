@@ -2,7 +2,7 @@ import React from "react";
 import { Pressable, Text, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Achat } from "../../types/achat.types";
-import { colors, styles } from "../../styles/styles.global";
+import { useTheme } from "../../constants/theme.constants";
 
 interface Props {
     item: Achat;
@@ -13,12 +13,14 @@ interface Props {
 }
 
 export default function AchatCard({
+
     item,
     getProduitNom,
     getFournisseurNom,
     onEdit,
     onDelete,
 }: Props) {
+    const { styles, colors } = useTheme();
     return (
         <View style={styles.card}>
             <View style={styles.cardHeader}>
@@ -40,14 +42,14 @@ export default function AchatCard({
 
             <View style={styles.infoRow}>
                 <View style={styles.infoItem}>
-                    <Ionicons name="business-outline" color="#2563EB" size={18} />
+                    <Ionicons name="business-outline" color={colors.primary} size={18} />
                     <Text style={styles.infoText}>
                         {getFournisseurNom(item.fournisseur_id)}
                     </Text>
                 </View>
 
                 <View style={styles.infoItem}>
-                    <Ionicons name="cube-outline" color="#2563EB" size={18} />
+                    <Ionicons name="cube-outline" color={colors.primary} size={18} />
 
                     <Text style={styles.infoText}>
                         {item.quantite} unité(s)

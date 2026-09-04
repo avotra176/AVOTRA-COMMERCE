@@ -1,7 +1,7 @@
 import React from "react";
 import { Pressable, TextInput, View } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
-import { styles } from "../../styles/styles.global";
+import { useTheme } from "../../constants/theme.constants";
 
 interface Props {
     value: string;
@@ -10,33 +10,32 @@ interface Props {
 }
 
 export default function ProduitSearch({ value, onChangeText, onClear }: Props) {
+    const { styles, colors } = useTheme();
 
     return (
-
         <View style={styles.containerSearch}>
             <Ionicons
                 name="search-outline"
                 size={21}
-                color="#6B7280"
+                color={colors.textLight}
             />
             <TextInput
                 style={styles.searchInput}
                 placeholder="Rechercher un produit..."
-                placeholderTextColor="#9CA3AF"
+                placeholderTextColor={colors.textLight}
                 value={value}
                 onChangeText={onChangeText}
                 autoCapitalize="none"
             />
             {value.length > 0 && (
-                <Pressable onPress={onClear}  >
+                <Pressable onPress={onClear}>
                     <Ionicons
                         name="close-circle"
                         size={21}
-                        color="#6B7280"
+                        color={colors.textLight}
                     />
                 </Pressable>
             )}
-
         </View>
     );
 }
