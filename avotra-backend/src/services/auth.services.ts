@@ -75,10 +75,10 @@ export const AuthService = {
     }
 
     const token = jwt.sign(
-      { 
-        id: user.id, 
-        email: user.email, 
-        role: user.role 
+      {
+        id: user.id,
+        email: user.email,
+        role: user.role
       },
       process.env.JWT_SECRET as string,
       { expiresIn: "1d" }
@@ -86,5 +86,30 @@ export const AuthService = {
 
     const { mot_de_passe: _, ...userSafe } = user;
     return { token, user: userSafe };
+  },
+  // Changer le mot de passe (utilisateur connecté)
+  async changePassword(userId: number, ancienMotDePasse: string, nouveauMotDePasse: string) {
+    if (!ancienMotDePasse || !nouveauMotDePasse) {
+      throw new Error("L'ancien et le nouveau mot de passe sont obligatoires");
+    }
+
+    if (nouveauMotDePasse.length < 6) {
+      throw new Error("Le nouveau mot de passe doit contenir au moins 6 caractères");
+    }
+
+    const result = await pool.query("SELECT * FROM utilisateurs WHERE id = $1", [userId]);
+    const user = result.rows[0] as Utilisateur | undefined;
+
+    if (!user) {
+      throw new Error("Utilisateur introuvable");
+    }
+
+    const isValidPassword = await bcrypt.compare(ancienMotDePasse, user.mot_de_passe);
+    if (!isValidPassword) {
+      throw new Error("Ancien mot de passe incorrect");
+    }
+
+    const hashedPassword = await bcrypt.hash(nouveauMotDePasse, 10);
+    await pool.query("UPDATE utilisateurs SET mot_de_passe = $1 WHERE id = $2", [hashedPassword, userId]);
   },
 };

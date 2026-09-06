@@ -19,6 +19,7 @@ import { useTheme } from "../../constants/theme.constants";
 import EmptyVentes from "@/components/ventes/EmptyVentes";
 import VenteCard from "@/components/ventes/VenteCard";
 import VenteFormModal from "@/components/ventes/VenteFormModal";
+import AppHeader from "@/components/ui/AppHeader";
 
 export default function VentesScreen() {
     const { ventes, loading, fetchVentes, addVente, editVente, removeVente } = useVentes();
@@ -174,31 +175,23 @@ export default function VentesScreen() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <View style={styles.headerText}>
-                    <Text style={styles.title}>Ventes</Text>
-                    <Text style={styles.subtitle}>Gestion des ventes et du stock</Text>
+            <AppHeader title="Ventes" subtitle="Gestion des ventes et du stock" rightIcon="add-circle" onRightPress={openCreateModal}  >
+                <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "rgba(255,255,255,0.12)", borderRadius: 12, paddingHorizontal: 12, height: 44 }}>
+                    <Ionicons name="search-outline" size={19} color="rgba(255,255,255,0.7)" />
+                    <TextInput
+                        style={{ flex: 1, marginLeft: 8, color: colors.white, fontSize: 15 }}
+                        placeholder="Rechercher une vente..."
+                        placeholderTextColor="rgba(255,255,255,0.5)"
+                        value={search}
+                        onChangeText={setSearch}
+                    />
+                    {search.length > 0 && (
+                        <Pressable onPress={() => setSearch("")}>
+                            <Ionicons name="close-circle" size={22} color="#777" />
+                        </Pressable>
+                    )}
                 </View>
-                <Pressable style={styles.addButton} onPress={openCreateModal}>
-                    <Text style={styles.plus}>+</Text>
-                    <Text style={styles.addText}> Ajouter</Text>
-                </Pressable>
-            </View>
-
-            <View style={styles.containerSearch}>
-                <Ionicons name="search-outline" size={22} color="#777" />
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder="Rechercher une vente..."
-                    value={search}
-                    onChangeText={setSearch}
-                />
-                {search.length > 0 && (
-                    <Pressable onPress={() => setSearch("")}>
-                        <Ionicons name="close-circle" size={22} color="#777" />
-                    </Pressable>
-                )}
-            </View>
+            </AppHeader>
 
             <FlatList
                 data={filteredVentes}

@@ -13,6 +13,7 @@ import { useProduits } from "../../hooks/useProduits";
 import { Produit, ProduitFormData, initialForm } from "../../types/produit.types";
 import { useCategories } from "@/hooks/useCategories";
 import { useTheme } from "../../constants/theme.constants";
+import AppHeader from "@/components/ui/AppHeader";
 
 interface Categorie {
     id: number;
@@ -161,26 +162,11 @@ export default function ProduitsScreen() {
 
     return (
         <SafeAreaView style={styles.container}>
-            <View style={styles.header}>
-                <View>
-                    <Text style={styles.title}>Produits</Text>
-                    <Text style={styles.subtitle}>Liste des produits</Text>
-                </View>
-                <Pressable
-                    style={[styles.addButton, loadingCategories && styles.addButtonDisabled]}
-                    onPress={openCreate}
-                    disabled={loadingCategories}
-                >
-                    {loadingCategories ? (
-                        <ActivityIndicator size="small" color={colors.white} />
-                    ) : (
-                        <Ionicons name="add" size={20} color={colors.white} />
-                    )}
-                    <Text style={styles.addText}>{loadingCategories ? "Chargement..." : "Ajouter"}</Text>
-                </Pressable>
-            </View>
+            <AppHeader title="Produits" subtitle="Gestion des produits" rightIcon="add-circle"
+                onRightPress={openCreate}>
+                <ProduitSearch value={search} onChangeText={searchProduits} onClear={() => searchProduits("")} />
 
-            <ProduitSearch value={search} onChangeText={searchProduits} onClear={() => searchProduits("")} />
+            </AppHeader>
 
             <FlatList
                 data={produits}

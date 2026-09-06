@@ -20,7 +20,7 @@ import { useTheme } from "../../constants/theme.constants";
 import EmptyAchats from "@/components/achats/EmptyAchats";
 import AchatCard from "@/components/achats/AchatCard";
 import AchatFormModal from "@/components/achats/AchatFormModal";
-import { colors } from '../../styles/styles.global';
+import AppHeader from "../../components/ui/AppHeader";
 
 
 
@@ -294,47 +294,28 @@ export default function AchatsScreen() {
     return (
         <SafeAreaView style={styles.container}>
             {/* HEADER */}
-            <View style={styles.header}>
-                <View style={styles.headerText}>
-                    <Text style={styles.title}> Achats </Text>
-                    <Text style={styles.subtitle}> Gestion des achats et du stock</Text>
+            <AppHeader
+                title="Achats"
+                subtitle="Gestion des achats et du stock"
+                rightIcon="add-circle"
+                onRightPress={openCreateModal}
+            >
+                <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "rgba(255,255,255,0.12)", borderRadius: 12, paddingHorizontal: 12, height: 44 }}>
+                    <Ionicons name="search-outline" size={19} color="rgba(255,255,255,0.7)" />
+                    <TextInput
+                        style={{ flex: 1, marginLeft: 8, color: colors.white, fontSize: 15 }}
+                        placeholder="Rechercher un achat..."
+                        placeholderTextColor="rgba(255,255,255,0.5)"
+                        value={search}
+                        onChangeText={handleSearch}
+                    />
+                    {search.length > 0 && (
+                        <Pressable onPress={() => handleSearch("")}>
+                            <Ionicons name="close-circle" size={19} color="rgba(255,255,255,0.7)" />
+                        </Pressable>
+                    )}
                 </View>
-                <Pressable
-                    style={styles.addButton}
-                    onPress={openCreateModal}
-                >
-                    <Text style={styles.plus}>+</Text>
-                    <Text style={styles.addText}> Ajouter</Text>
-                </Pressable>
-            </View>
-
-            {/* RECHERCHE */}
-            <View style={styles.containerSearch}>
-                <Ionicons
-                    name="search-outline"
-                    size={22}
-                    color={colors.textSecondary}
-                />
-                <TextInput
-                    style={styles.searchInput}
-                    placeholder="Rechercher un achat..."
-                    value={search}
-                    onChangeText={handleSearch}
-                />
-                {search.length > 0 && (
-                    <Pressable
-                        onPress={() =>
-                            handleSearch("")
-                        }
-                    >
-                        <Ionicons
-                            name="close-circle"
-                            size={22}
-                            color={colors.textSecondary}
-                        />
-                    </Pressable>
-                )}
-            </View>
+            </AppHeader>
 
             {/* LISTE */}
             <FlatList

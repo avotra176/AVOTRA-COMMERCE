@@ -9,8 +9,13 @@ import { useProduits } from "../../hooks/useProduits";
 import { useDepenses } from "../../hooks/useDepenses";
 import { getAchats } from "../../services/achat.service";
 import { Achat } from "../../types/achat.types";
+import AppHeader from "../../components/ui/AppHeader";
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 
 const SEUIL_STOCK_FAIBLE = 5;
+const RING_SIZE = 130;
+const RING_STROKE = 12;
 
 export default function HomeScreen() {
     const { user } = useAuth();
@@ -46,6 +51,7 @@ export default function HomeScreen() {
         setRefreshing(false);
     };
 
+    // STATS
     const chiffreAffaires = useMemo(
         () => ventes.reduce((total, v) => total + Number(v.montant_total), 0),
         [ventes]
@@ -58,66 +64,48 @@ export default function HomeScreen() {
 
     const beneficeNet = chiffreAffaires - totalAchats;
 
-    const stockTotal = useMemo(
-        () => (produits || []).reduce((total, p: any) => total + Number(p.stock), 0),
-        [produits]
-    );
+    const totalProduits = (produits || []).length;
 
-    const valeurStock = useMemo(
-        () => (produits || []).reduce((total, p: any) => total + Number(p.stock) * Number(p.prix_vente), 0),
+    const produitsRupture = useMemo(
+        () => (produits || []).filter((p: any) => Number(p.stock) <= 0),
         [produits]
     );
 
     const produitsStockFaible = useMemo(
         () =>
             (produits || [])
-                .filter((p: any) => Number(p.stock) <= SEUIL_STOCK_FAIBLE)
+                .filter((p: any) => Number(p.stock) > 0 && Number(p.stock) <= SEUIL_STOCK_FAIBLE)
                 .sort((a: any, b: any) => a.stock - b.stock),
         [produits]
     );
 
-    const dernieresVentes = useMemo(() => [...ventes].slice(0, 5), [ventes]);
+    const produitsBienApprovisionnes = totalProduits - produitsRupture.length - produitsStockFaible.length;
 
-    const ventes7Jours = useMemo(() => {
-        const jours = Array.from({ length: 7 }).map((_, i) => {
-            const date = new Date();
-            date.setDate(date.getDate() - (6 - i));
-            return date;
-        });
+    // SCORE DE SANTÉ DU STOCK (0-100)
+    const scoreStock = useMemo(() => {
+        if (totalProduits === 0) return 0;
+        const ratioOk = produitsBienApprovisionnes / totalProduits;
+        const ratioRupture = produitsRupture.length / totalProduits;
+        // pénalise fortement les ruptures, un peu moins le stock faible
+        const score = ratioOk * 100 - ratioRupture * 30;
+        return Math.max(0, Math.min(100, Math.round(score)));
+    }, [totalProduits, produitsBienApprovisionnes, produitsRupture]);
 
-        return jours.map((date) => {
-            const cle = date.toISOString().split("T")[0];
-            const total = ventes
-                .filter((v) => v.date_vente?.split("T")[0] === cle)
-                .reduce((sum, v) => sum + Number(v.montant_total), 0);
+    const scoreLabel =
+        scoreStock >= 80 ? "Excellent" : scoreStock >= 50 ? "Correct" : "À surveiller";
 
-            const label = date
-                .toLocaleDateString("fr-FR", { weekday: "short" })
-                .replace(".", "");
+    const scoreColor =
+        scoreStock >= 80 ? colors.success : scoreStock >= 50 ? colors.warning : colors.danger;
 
-            return { label, total, isToday: cle === new Date().toISOString().split("T")[0] };
-        });
-    }, [ventes]);
+    const pctBienApprovisionne = totalProduits ? Math.round((produitsBienApprovisionnes / totalProduits) * 100) : 0;
+    const pctStockFaible = totalProduits ? Math.round((produitsStockFaible.length / totalProduits) * 100) : 0;
+    const pctRupture = totalProduits ? Math.round((produitsRupture.length / totalProduits) * 100) : 0;
 
-    const maxVente7Jours = Math.max(...ventes7Jours.map((j) => j.total), 1);
-
-    const depensesDuMois = useMemo(() => {
-        const now = new Date();
-        return depenses.filter((d) => {
-            const date = new Date(d.date_depense);
-            return date.getMonth() === now.getMonth() && date.getFullYear() === now.getFullYear();
-        });
-    }, [depenses]);
-
-    const totalDepensesMois = useMemo(
-        () => depensesDuMois.reduce((total, d) => total + Number(d.montant), 0),
-        [depensesDuMois]
+    // PRODUITS À SURVEILLER (rupture + faible), pour la liste horizontale
+    const produitsASurveiller = useMemo(
+        () => [...produitsRupture, ...produitsStockFaible].slice(0, 8),
+        [produitsRupture, produitsStockFaible]
     );
-
-    const getProduitNom = (id: number) => {
-        const produit = produits?.find((p: any) => p.id === id);
-        return produit?.nom || `Produit #${id}`;
-    };
 
     const formatPrice = (value: number) => `${Number(value).toLocaleString("fr-FR")} Ar`;
 
@@ -125,222 +113,338 @@ export default function HomeScreen() {
 
     if (loading && ventes.length === 0 && (produits || []).length === 0) {
         return (
-            <View style={styles.loading}>
-                <ActivityIndicator size="large" color={colors.primary} />
-                <Text style={styles.loadingText}>Chargement du tableau de bord...</Text>
-            </View>
+            <SafeAreaView style={styles.container}>
+                <View style={styles.loading}>
+                    <ActivityIndicator size="large" color={colors.primary} />
+                    <Text style={styles.loadingText}>Chargement du tableau de bord...</Text>
+                </View>
+            </SafeAreaView>
         );
     }
 
+    // Calcul du cercle SVG
+    const radius = (RING_SIZE - RING_STROKE) / 2;
+    const circumference = 2 * Math.PI * radius;
+    const dashOffset = circumference - (scoreStock / 100) * circumference;
+
     return (
-        <ScrollView
-            style={styles.container}
-            contentContainerStyle={[styles.content, { paddingTop: 55 }]}
-            refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
-        >
-            <Text style={[styles.title, { fontSize: 28 }]}>AVOTRA COMMERCE</Text>
+        <SafeAreaView style={styles.container} edges={["top"]}>
+            <AppHeader
+                title="AVOTRA COMMERCE"
+                subtitle={`Bonjour ${user?.nom || user?.email}`}
+                rightIcon="notifications-outline"
+                onRightPress={() => { }}
 
-            <Text style={[styles.listText, { marginTop: 8, fontSize: 16 }]}>
-                Bonjour {user?.nom || user?.email}
-            </Text>
+            />
 
-            <Text style={[styles.title, { fontSize: 23, marginTop: 35, marginBottom: 20 }]}>
-                Tableau de bord
-            </Text>
 
-            <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: 15 }}>
-                <View style={[styles.card, { width: "48%" }]}>
-                    <Text style={{ fontSize: 15, color: colors.textSecondary }}>Chiffre d'affaires</Text>
-                    <Text style={[styles.total, { marginTop: 8, fontSize: 20 }]}>
-                        {formatPrice(chiffreAffaires)}
-                    </Text>
+            <ScrollView
+                style={styles.container}
+                contentContainerStyle={[styles.content, { paddingTop: 55 }]}
+                refreshControl={<RefreshControl refreshing={refreshing} onRefresh={handleRefresh} />}
+            >
+
+                {/* SCORE DE SANTÉ DU STOCK */}
+                <View style={[styles.card, { marginTop: 25, flexDirection: "row", alignItems: "center" }]}>
+                    <View style={{ width: RING_SIZE, height: RING_SIZE, alignItems: "center", justifyContent: "center" }}>
+                        <ProgressRing
+                            size={RING_SIZE}
+                            strokeWidth={RING_STROKE}
+                            percentage={scoreStock}
+                            color={scoreColor}
+                            trackColor={colors.surfaceAlt}
+                        />
+                        <View style={{ position: "absolute", alignItems: "center" }}>
+                            <Text style={{ fontSize: 30, fontWeight: "800", color: colors.text }}>
+                                {scoreStock}
+                            </Text>
+                            <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }}>
+                                {scoreLabel}
+                            </Text>
+                        </View>
+                    </View>
+
+                    <View style={{ flex: 1, marginLeft: 16 }}>
+                        <Text style={{ fontSize: 13, fontWeight: "700", color: colors.text, marginBottom: 10 }}>
+                            Santé du stock
+                        </Text>
+
+                        <View style={{ marginBottom: 8 }}>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
+                                <Text style={{ fontSize: 12, color: colors.textSecondary }}>Bien approvisionné</Text>
+                                <Text style={{ fontSize: 12, fontWeight: "700", color: colors.success }}>{pctBienApprovisionne}%</Text>
+                            </View>
+                            <View style={{ height: 5, borderRadius: 3, backgroundColor: colors.surfaceAlt }}>
+                                <View style={{ height: 5, borderRadius: 3, width: `${pctBienApprovisionne}%`, backgroundColor: colors.success }} />
+                            </View>
+                        </View>
+
+                        <View style={{ marginBottom: 8 }}>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
+                                <Text style={{ fontSize: 12, color: colors.textSecondary }}>Stock faible</Text>
+                                <Text style={{ fontSize: 12, fontWeight: "700", color: colors.warning }}>{pctStockFaible}%</Text>
+                            </View>
+                            <View style={{ height: 5, borderRadius: 3, backgroundColor: colors.surfaceAlt }}>
+                                <View style={{ height: 5, borderRadius: 3, width: `${pctStockFaible}%`, backgroundColor: colors.warning }} />
+                            </View>
+                        </View>
+
+                        <View>
+                            <View style={{ flexDirection: "row", justifyContent: "space-between", marginBottom: 3 }}>
+                                <Text style={{ fontSize: 12, color: colors.textSecondary }}>En rupture</Text>
+                                <Text style={{ fontSize: 12, fontWeight: "700", color: colors.danger }}>{pctRupture}%</Text>
+                            </View>
+                            <View style={{ height: 5, borderRadius: 3, backgroundColor: colors.surfaceAlt }}>
+                                <View style={{ height: 5, borderRadius: 3, width: `${pctRupture}%`, backgroundColor: colors.danger }} />
+                            </View>
+                        </View>
+                    </View>
                 </View>
 
-                <View style={[styles.card, { width: "48%" }]}>
-                    <Text style={{ fontSize: 15, color: colors.textSecondary }}>Ventes</Text>
-                    <Text style={[styles.total, { marginTop: 8, fontSize: 22 }]}>{ventes.length}</Text>
-                </View>
+                {/* À SURVEILLER */}
+                {produitsASurveiller.length > 0 && (
+                    <>
+                        <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", marginTop: 30, marginBottom: 12 }}>
+                            <View>
+                                <Text style={{ fontSize: 12, color: colors.textLight, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                                    À réapprovisionner
+                                </Text>
+                                <Text style={[styles.title, { fontSize: 20, marginTop: 2 }]}>À surveiller</Text>
+                            </View>
+                            <Pressable onPress={() => router.push("/produits")}>
+                                <Text style={{ fontSize: 13, fontWeight: "600", color: colors.primary }}>Voir tout</Text>
+                            </Pressable>
+                        </View>
 
-                <View style={[styles.card, { width: "48%" }]}>
-                    <Text style={{ fontSize: 15, color: colors.textSecondary }}>Produits</Text>
-                    <Text style={[styles.total, { marginTop: 8, fontSize: 22 }]}>
-                        {(produits || []).length}
-                    </Text>
-                </View>
+                        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginHorizontal: -20 }} contentContainerStyle={{ paddingHorizontal: 20, gap: 12 }}>
+                            {produitsASurveiller.map((produit: any) => {
+                                const rupture = produit.stock <= 0;
+                                return (
+                                    <Pressable
+                                        key={produit.id}
+                                        style={{
+                                            width: 130,
+                                            backgroundColor: colors.surface,
+                                            borderRadius: 16,
+                                            borderWidth: 1,
+                                            borderColor: colors.border,
+                                            padding: 12,
+                                        }}
+                                        onPress={() => router.push("/produits")}
+                                    >
+                                        <View
+                                            style={{
+                                                alignSelf: "flex-start",
+                                                paddingHorizontal: 8,
+                                                paddingVertical: 3,
+                                                borderRadius: 999,
+                                                backgroundColor: rupture ? colors.dangerSoft : colors.accentSoft,
+                                                marginBottom: 10,
+                                            }}
+                                        >
+                                            <Text style={{ fontSize: 10, fontWeight: "700", color: rupture ? colors.danger : colors.accent }}>
+                                                {rupture ? "Rupture" : "Stock bas"}
+                                            </Text>
+                                        </View>
 
-                <View style={[styles.card, { width: "48%" }]}>
-                    <Text style={{ fontSize: 15, color: colors.textSecondary }}>Stock total</Text>
-                    <Text style={[styles.total, { marginTop: 8, fontSize: 22 }]}>{stockTotal}</Text>
-                </View>
+                                        <View
+                                            style={{
+                                                width: 40,
+                                                height: 40,
+                                                borderRadius: 10,
+                                                backgroundColor: colors.primarySoft,
+                                                justifyContent: "center",
+                                                alignItems: "center",
+                                                marginBottom: 10,
+                                            }}
+                                        >
+                                            <Ionicons name="cube-outline" size={20} color={colors.primary} />
+                                        </View>
 
-                <View style={[styles.card, { width: "48%" }]}>
-                    <Text style={{ fontSize: 15, color: colors.textSecondary }}>Bénéfice net</Text>
-                    <Text
-                        style={[
-                            styles.total,
-                            { marginTop: 8, fontSize: 20, color: beneficeNet >= 0 ? colors.success : colors.danger },
-                        ]}
+                                        <Text style={{ fontSize: 13, fontWeight: "700", color: colors.text }} numberOfLines={1}>
+                                            {produit.nom}
+                                        </Text>
+                                        <Text style={{ fontSize: 12, color: colors.textSecondary, marginTop: 2 }}>
+                                            {produit.stock} {produit.unite}
+                                        </Text>
+                                    </Pressable>
+                                );
+                            })}
+                        </ScrollView>
+                    </>
+                )}
+
+                {/* ACTIONS RAPIDES */}
+                <Text style={[styles.title, { fontSize: 20, marginTop: 30, marginBottom: 12 }]}>
+                    Actions rapides
+                </Text>
+
+                <View style={{ flexDirection: "row", flexWrap: "wrap", justifyContent: "space-between", rowGap: 12 }}>
+                    <Pressable
+                        style={{
+                            width: "48%",
+                            backgroundColor: colors.primary,
+                            borderRadius: 18,
+                            padding: 18,
+                            minHeight: 100,
+                            justifyContent: "space-between",
+                        }}
+                        onPress={() => router.push("/ventes")}
                     >
-                        {formatPrice(beneficeNet)}
-                    </Text>
+                        <Ionicons name="cash-outline" size={24} color={colors.white} />
+                        <Text style={{ color: colors.white, fontWeight: "700", fontSize: 14, marginTop: 10 }}>
+                            Nouvelle vente
+                        </Text>
+                    </Pressable>
+
+                    <Pressable
+                        style={{
+                            width: "48%",
+                            backgroundColor: colors.surface,
+                            borderRadius: 18,
+                            padding: 18,
+                            minHeight: 100,
+                            justifyContent: "space-between",
+                            borderWidth: 1,
+                            borderColor: colors.border,
+                        }}
+                        onPress={() => router.push("/achats")}
+                    >
+                        <Ionicons name="cart-outline" size={24} color={colors.text} />
+                        <Text style={{ color: colors.text, fontWeight: "700", fontSize: 14, marginTop: 10 }}>
+                            Nouvel achat
+                        </Text>
+                    </Pressable>
+
+                    <Pressable
+                        style={{
+                            width: "48%",
+                            backgroundColor: colors.surface,
+                            borderRadius: 18,
+                            padding: 18,
+                            minHeight: 100,
+                            justifyContent: "space-between",
+                            borderWidth: 1,
+                            borderColor: colors.border,
+                        }}
+                        onPress={() => router.push("/produits")}
+                    >
+                        <Ionicons name="add-circle-outline" size={24} color={colors.text} />
+                        <Text style={{ color: colors.text, fontWeight: "700", fontSize: 14, marginTop: 10 }}>
+                            Ajouter produit
+                        </Text>
+                    </Pressable>
+
+                    <Pressable
+                        style={{
+                            width: "48%",
+                            backgroundColor: colors.surface,
+                            borderRadius: 18,
+                            padding: 18,
+                            minHeight: 100,
+                            justifyContent: "space-between",
+                            borderWidth: 1,
+                            borderColor: colors.border,
+                        }}
+                        onPress={() => router.push("/mes-depenses")}
+                    >
+                        <Ionicons name="wallet-outline" size={24} color={colors.text} />
+                        <Text style={{ color: colors.text, fontWeight: "700", fontSize: 14, marginTop: 10 }}>
+                            Mes dépenses
+                        </Text>
+                    </Pressable>
                 </View>
 
-                <View style={[styles.card, { width: "48%" }]}>
-                    <Text style={{ fontSize: 15, color: colors.textSecondary }}>Valeur du stock</Text>
-                    <Text style={[styles.total, { marginTop: 8, fontSize: 20 }]}>
-                        {formatPrice(valeurStock)}
-                    </Text>
+                {/* RÉSUMÉ FINANCIER (repris de l'ancien dashboard, condensé) */}
+                <Text style={[styles.title, { fontSize: 20, marginTop: 30, marginBottom: 12 }]}>
+                    Résumé
+                </Text>
+
+                <View style={{ flexDirection: "row", gap: 12, marginBottom: 30 }}>
+                    <View style={[styles.card, { flex: 1, marginBottom: 0 }]}>
+                        <Text style={{ fontSize: 13, color: colors.textSecondary }}>Chiffre d'affaires</Text>
+                        <Text style={[styles.total, { marginTop: 6, fontSize: 17 }]}>{formatPrice(chiffreAffaires)}</Text>
+                    </View>
+
+                    <View style={[styles.card, { flex: 1, marginBottom: 0 }]}>
+                        <Text style={{ fontSize: 13, color: colors.textSecondary }}>Bénéfice net</Text>
+                        <Text
+                            style={[
+                                styles.total,
+                                { marginTop: 6, fontSize: 17, color: beneficeNet >= 0 ? colors.success : colors.danger },
+                            ]}
+                        >
+                            {formatPrice(beneficeNet)}
+                        </Text>
+                    </View>
                 </View>
-            </View>
+            </ScrollView>
 
-            <Text style={[styles.title, { fontSize: 20, marginTop: 35, marginBottom: 15 }]}>
-                Ventes — 7 derniers jours
-            </Text>
+        </SafeAreaView>
 
-            <View style={styles.card}>
+    );
+};
+function ProgressRing({
+    size,
+    strokeWidth,
+    percentage,
+    color,
+    trackColor,
+}: {
+    size: number;
+    strokeWidth: number;
+    percentage: number;
+    color: string;
+    trackColor: string;
+}) {
+    const clamped = Math.max(0, Math.min(100, percentage));
+    const rotation = (clamped / 100) * 360;
+
+    return (
+        <View style={{ width: size, height: size }}>
+            {/* Piste de fond */}
+            <View
+                style={{
+                    position: "absolute",
+                    width: size,
+                    height: size,
+                    borderRadius: size / 2,
+                    borderWidth: strokeWidth,
+                    borderColor: trackColor,
+                }}
+            />
+
+            {/* Moitié gauche (0-50%) */}
+            <View
+                style={{
+                    position: "absolute",
+                    width: size,
+                    height: size,
+                    borderRadius: size / 2,
+                    borderWidth: strokeWidth,
+                    borderColor: "transparent",
+                    borderTopColor: clamped > 0 ? color : "transparent",
+                    borderRightColor: clamped > 25 ? color : "transparent",
+                    transform: [{ rotate: `${Math.min(rotation, 180)}deg` }],
+                }}
+            />
+
+            {/* Moitié droite (50-100%), affichée seulement au-delà de 50% */}
+            {clamped > 50 && (
                 <View
                     style={{
-                        flexDirection: "row",
-                        justifyContent: "space-between",
-                        alignItems: "flex-end",
-                        height: 110,
-                        marginBottom: 8,
+                        position: "absolute",
+                        width: size,
+                        height: size,
+                        borderRadius: size / 2,
+                        borderWidth: strokeWidth,
+                        borderColor: "transparent",
+                        borderBottomColor: color,
+                        borderLeftColor: clamped > 75 ? color : "transparent",
+                        transform: [{ rotate: `${rotation - 180}deg` }],
                     }}
-                >
-                    {ventes7Jours.map((jour, index) => {
-                        const hauteur = (jour.total / maxVente7Jours) * 90;
-                        return (
-                            <View key={index} style={{ alignItems: "center", flex: 1 }}>
-                                <View
-                                    style={{
-                                        width: 18,
-                                        height: Math.max(hauteur, 3),
-                                        borderRadius: 6,
-                                        backgroundColor: jour.isToday ? colors.primary : colors.primarySoft,
-                                    }}
-                                />
-                            </View>
-                        );
-                    })}
-                </View>
-
-                <View style={{ flexDirection: "row", justifyContent: "space-between" }}>
-                    {ventes7Jours.map((jour, index) => (
-                        <Text
-                            key={index}
-                            style={{
-                                flex: 1,
-                                textAlign: "center",
-                                fontSize: 12,
-                                fontWeight: jour.isToday ? "700" : "500",
-                                color: jour.isToday ? colors.primary : colors.textSecondary,
-                                textTransform: "capitalize",
-                            }}
-                        >
-                            {jour.label}
-                        </Text>
-                    ))}
-                </View>
-            </View>
-
-            {produitsStockFaible.length > 0 && (
-                <>
-                    <View style={{ flexDirection: "row", alignItems: "center", marginTop: 35, marginBottom: 15 }}>
-                        <Ionicons name="warning-outline" size={22} color={colors.danger} />
-                        <Text style={[styles.title, { fontSize: 20, marginLeft: 8 }]}>Stock faible</Text>
-                    </View>
-
-                    <View style={{ gap: 10 }}>
-                        {produitsStockFaible.slice(0, 5).map((produit: any) => (
-                            <Pressable
-                                key={produit.id}
-                                style={[
-                                    styles.card,
-                                    {
-                                        flexDirection: "row",
-                                        justifyContent: "space-between",
-                                        alignItems: "center",
-                                        borderLeftWidth: 4,
-                                        borderLeftColor: produit.stock <= 0 ? colors.danger : colors.warning,
-                                    },
-                                ]}
-                                onPress={() => router.push("/produits")}
-                            >
-                                <Text style={{ fontSize: 15, fontWeight: "500", color: colors.text }}>
-                                    {produit.nom}
-                                </Text>
-                                <Text
-                                    style={{
-                                        fontSize: 14,
-                                        fontWeight: "700",
-                                        color: produit.stock <= 0 ? colors.danger : colors.warning,
-                                    }}
-                                >
-                                    {produit.stock <= 0 ? "Rupture" : `${produit.stock} restant(s)`}
-                                </Text>
-                            </Pressable>
-                        ))}
-                    </View>
-                </>
+                />
             )}
-
-            <View style={{ flexDirection: "row", alignItems: "center", marginTop: 35, marginBottom: 15 }}>
-                <Ionicons name="wallet-outline" size={22} color={colors.accent} />
-                <Text style={[styles.title, { fontSize: 20, marginLeft: 8 }]}>Mes dépenses ce mois</Text>
-            </View>
-
-            <Pressable
-                style={[styles.card, { flexDirection: "row", justifyContent: "space-between", alignItems: "center" }]}
-                onPress={() => router.push("/mes-depenses")}
-            >
-                <View>
-                    <Text style={{ fontSize: 15, fontWeight: "500", color: colors.text }}>
-                        {depensesDuMois.length} dépense{depensesDuMois.length > 1 ? "s" : ""} enregistrée
-                        {depensesDuMois.length > 1 ? "s" : ""}
-                    </Text>
-                    <Text style={{ fontSize: 13, color: colors.textSecondary, marginTop: 2 }}>
-                        Voir le détail
-                    </Text>
-                </View>
-                <Text style={{ fontSize: 17, fontWeight: "700", color: colors.danger }}>
-                    -{formatPrice(totalDepensesMois)}
-                </Text>
-            </Pressable>
-
-            <View style={{ flexDirection: "row", alignItems: "center", marginTop: 35, marginBottom: 15 }}>
-                <Ionicons name="time-outline" size={22} color={colors.primary} />
-                <Text style={[styles.title, { fontSize: 20, marginLeft: 8 }]}>Dernières ventes</Text>
-            </View>
-
-            {dernieresVentes.length === 0 ? (
-                <View style={styles.card}>
-                    <Text style={{ textAlign: "center", color: colors.textSecondary }}>
-                        Aucune vente enregistrée
-                    </Text>
-                </View>
-            ) : (
-                <View style={{ gap: 10, marginBottom: 30 }}>
-                    {dernieresVentes.map((vente) => (
-                        <Pressable
-                            key={vente.id}
-                            style={[styles.card, { flexDirection: "row", justifyContent: "space-between", alignItems: "center" }]}
-                            onPress={() => router.push("/ventes")}
-                        >
-                            <View>
-                                <Text style={{ fontSize: 15, fontWeight: "500", color: colors.text }}>
-                                    {getProduitNom(vente.produit_id)}
-                                </Text>
-                                <Text style={{ fontSize: 13, color: colors.textSecondary, marginTop: 2 }}>
-                                    {new Date(vente.date_vente).toLocaleDateString("fr-FR")}
-                                </Text>
-                            </View>
-                            <Text style={{ fontSize: 15, fontWeight: "700", color: colors.success }}>
-                                {formatPrice(vente.montant_total)}
-                            </Text>
-                        </Pressable>
-                    ))}
-                </View>
-            )}
-        </ScrollView>
+        </View>
     );
 }

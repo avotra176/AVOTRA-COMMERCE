@@ -73,6 +73,7 @@ export default function ProfilScreen() {
     const initiale = (user?.nom || user?.email || "?").charAt(0).toUpperCase();
 
     return (
+
         <ScrollView
             style={styles.container}
             contentContainerStyle={[styles.content, { paddingTop: 55, flexGrow: 1 }]}
@@ -131,6 +132,16 @@ export default function ProfilScreen() {
                     label="Mes dépenses personnelles"
                     onPress={() => router.push("/mes-depenses")}
                 />
+                {user?.role === "admin" && (
+                    <>
+                        <View style={styles.separator} />
+                        <MenuItem
+                            icon="person-add-outline"
+                            label="Créer un compte"
+                            onPress={() => router.push("/register" as any)}
+                        />
+                    </>
+                )}
             </View>
 
             <Text style={[styles.label, { marginTop: 20, marginBottom: 5, marginLeft: 4 }]}>Préférences</Text>
