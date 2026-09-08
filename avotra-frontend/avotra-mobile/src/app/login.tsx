@@ -8,12 +8,14 @@ import {
   ScrollView,
   TextInput,
   TouchableOpacity,
+  SafeAreaView,
   View,
 } from "react-native";
 import { useState } from "react";
 import { useRouter } from "expo-router";
 import { useAuth } from "../constants/auth.constants";
 import { useTheme } from "../constants/theme.constants";
+import AppHeader from '../components/ui/AppHeader';
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -56,68 +58,80 @@ export default function LoginScreen() {
   return (
 
     <KeyboardAvoidingView
-      style={[styles.container, { justifyContent: "center", padding: 0 }] as any}
+      style={[styles.container, { justifyContent: "center", paddingTop: 40, padding: 0, }] as any}
       behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <ScrollView
-        style={styles.container}
-        contentContainerStyle={[styles.content, { paddingTop: 55, flexGrow: 1, justifyContent: "center" }]}
-        keyboardShouldPersistTaps="handled"
-        showsVerticalScrollIndicator={false}
-      >
-        <View style={[styles.card, { marginBottom: 20 }]}>
-          <Image
+      <SafeAreaView style={styles.container} >
+        <AppHeader title="Connexion" >m
+          <View style={{ flexDirection: "row", alignItems: "flex-start", justifyContent: "flex-start" }}><Image
             source={require("../../assets/images/LOGO_PRINCIPAL.png")}
-            style={{ width: 130, height: 130, alignSelf: "center" }}
+            style={{ width: 100, height: 100, alignSelf: "flex-start" }}
             resizeMode="contain"
           />
-        </View>
+            <View style={{ flexDirection: "column", alignItems: "flex-start", justifyContent: "flex-start" }}>
+              <Text style={[styles.title, { fontSize: 22, textAlign: "center", marginTop: 8, marginLeft: 10 }]}>
+                AVOTRA HOLDINGS
+              </Text>
+              <Text style={[styles.subtitle, { fontSize: 11, textAlign: "center", marginTop: 8, marginBottom: 25, marginLeft: 10 }]}>
+                Commerce | Agriculture | Distribution
+              </Text>
+            </View>
+          </View>
+        </AppHeader>
+        <ScrollView
+          style={styles.container}
+          contentContainerStyle={[styles.content, { paddingTop: 30, flexGrow: 1, justifyContent: "center" }]}
+          keyboardShouldPersistTaps="handled"
+          showsVerticalScrollIndicator={false}
+        >
 
-        <View style={[styles.card, { padding: 28, borderRadius: 24 }]}>
-          <Text style={[styles.title, { fontSize: 22, textAlign: "center", marginTop: 8 }]}>
-            AVOTRA COMMERCE
-          </Text>
 
-          <Text style={[styles.subtitle, { textAlign: "center", marginTop: 8, marginBottom: 25 }]}>
-            Connexion à votre compte
-          </Text>
+          <View style={[styles.card, { padding: 28, borderRadius: 24, marginTop: 15 }]}>
+            <Text style={[styles.title, { fontSize: 22, textAlign: "center", marginTop: 8 }]}>
+              AVOTRA COMMERCE
+            </Text>
 
-          <TextInput
-            style={[styles.input, { marginBottom: 15 }]}
-            placeholder="Email"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-          />
+            <Text style={[styles.subtitle, { textAlign: "center", marginTop: 8, marginBottom: 25 }]}>
+              Connexion à votre compte
+            </Text>
 
-          <TextInput
-            style={[styles.input, { marginBottom: 15 }]}
-            placeholder="Mot de passe"
-            value={password}
-            onChangeText={setPassword}
-            secureTextEntry
-          />
+            <TextInput
+              style={[styles.input, { marginBottom: 15 }]}
+              placeholder="Email"
+              value={email}
+              onChangeText={setEmail}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoCorrect={false}
+            />
 
-          <TouchableOpacity
-            style={[styles.button, styles.buttonPrimary, { marginTop: 5 }]}
-            onPress={handleLogin}
-            disabled={loginLoading}
-          >
-            {loginLoading ? (
-              <ActivityIndicator color={colors.primary} />
-            ) : (
-              <Text style={styles.buttonText}>Se connecter</Text>
-            )}
-          </TouchableOpacity>
-        </View>
-        <View style={[styles.card, { padding: 28, borderRadius: 24, marginTop: 10 }]}>
-          <Text style={[styles.subtitle, { textAlign: "center", marginTop: 8 }]}>
-            Vous n'avez pas de compte ? Contactez l'administrateur pour en créer un.
-          </Text>
-        </View>
-      </ScrollView>
+            <TextInput
+              style={[styles.input, { marginBottom: 15 }]}
+              placeholder="Mot de passe"
+              value={password}
+              onChangeText={setPassword}
+              secureTextEntry
+            />
+
+            <TouchableOpacity
+              style={[styles.button, styles.buttonPrimary, { marginTop: 5 }]}
+              onPress={handleLogin}
+              disabled={loginLoading}
+            >
+              {loginLoading ? (
+                <ActivityIndicator color={colors.primary} />
+              ) : (
+                <Text style={styles.buttonText}>Se connecter</Text>
+              )}
+            </TouchableOpacity>
+          </View>
+          <View style={[styles.card, { padding: 28, borderRadius: 24, marginTop: 10 }]}>
+            <Text style={[styles.subtitle, { textAlign: "center", marginTop: 8 }]}>
+              Vous n'avez pas de compte ? Contactez l'administrateur pour en créer un.
+            </Text>
+          </View>
+        </ScrollView>
+      </SafeAreaView>
     </KeyboardAvoidingView>
   );
 }

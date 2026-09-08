@@ -300,7 +300,7 @@ export default function AchatsScreen() {
                 rightIcon="add-circle"
                 onRightPress={openCreateModal}
             >
-                <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "rgba(255,255,255,0.12)", borderRadius: 12, paddingHorizontal: 12, height: 44 }}>
+                <View style={{ flexDirection: "row", alignItems: "center", backgroundColor: "rgba(255,255,255,0.12)", borderRadius: 12, paddingHorizontal: 12, height: 44, marginTop: 10, marginBottom: 5 }}>
                     <Ionicons name="search-outline" size={19} color="rgba(255,255,255,0.7)" />
                     <TextInput
                         style={{ flex: 1, marginLeft: 8, color: colors.white, fontSize: 15 }}

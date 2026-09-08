@@ -10,6 +10,7 @@ import { Ionicons } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { useAuth } from "../../constants/auth.constants";
 import { useTheme } from "../../constants/theme.constants";
+import AppHeader from '../../components/ui/AppHeader';
 
 interface MenuItemProps {
     icon: keyof typeof Ionicons.glyphMap;
@@ -79,7 +80,7 @@ export default function ProfilScreen() {
             contentContainerStyle={[styles.content, { paddingTop: 55, flexGrow: 1 }]}
             showsVerticalScrollIndicator={false}
         >
-            <Text style={[styles.title, { marginBottom: 25 }]}>Profil</Text>
+            <AppHeader title="Profil" />
 
             <View style={[styles.card, { alignItems: "center", paddingVertical: 30 }]}>
                 <View
@@ -89,7 +90,7 @@ export default function ProfilScreen() {
                         borderRadius: 36,
                         backgroundColor: colors.primarySoft,
                         justifyContent: "center",
-                        alignItems: "center",
+                        alignItems: "flex-start",
                         marginBottom: 16,
                     }}
                 >
